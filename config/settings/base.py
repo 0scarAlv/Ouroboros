@@ -27,6 +27,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'core',
+    "apps.authentication"
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -115,3 +116,5 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+AUTH_USER_MODEL = "authentication.User"
