@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.views import View
+from apps.authentication.forms import LoginForm
 
 class LoginView(View):
     """Handles user login via html templates"""
@@ -10,19 +11,20 @@ class LoginView(View):
         """Remder login form. Redirect if alredy authenticated"""
         if request.user.is_authenticated:
             return redirect("/admin/")
-        return render(request, self.template_name)
+        form = LoginForm()
+        return render(request, self.template_name, {"form": form})
     
     def post(self, request):
         """Process login form submission."""
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
+        form = LoginForm(request.POST)
 
-        if user is not None:
-            login(request,user)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
             return redirect("/admin/")
-        return render(request, self.template_name, {"error": "Invalid credentials"})
-    
+        return render(request, self.template_name, {"form": form})
+
+
 class LogoutView(View):
     """Handles user logout"""
     
