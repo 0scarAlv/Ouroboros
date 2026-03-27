@@ -11,16 +11,12 @@
             <div class="card-body p-4">
 
                 <h4 class="card-title mb-4 text-center fw-bold">Iniciar sesión</h4>
-                
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger py-2">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
 
-                <form method="post">
+                <form
+                    hx-post="{% url 'login' %}"
+                    hx-target="this"
+                    hx-swap="none"
+                >
                     {% csrf_token %}
 
                     {% render_field form.username %}
