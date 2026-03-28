@@ -8,28 +8,36 @@ import json
 class LoginView(View):
     """Handles user login via html templates"""
     template_name = "authentication/login.html"
+    form_fragment = "authentication/_login_form.html"
 
     def get(self, request):
-        """Remder login form. Redirect if alredy authenticated"""
+        """Render login form. Redirect if already authenticated."""
         if request.user.is_authenticated:
             return redirect("home")
         form = LoginForm()
         return render(request, self.template_name, {"form": form})
-    
+
     def post(self, request):
-        """Process login form submission."""
+        """Process login form submission via HTMX."""
         form = LoginForm(request.POST)
 
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
+            login(request, form.get_user())
             response = HttpResponse(status=200)
             response["HX-Redirect"] = "/"
             return response
-        response = HttpResponse(status=200)
+
+        has_field_errors = any(
+            field != "__all__" for field in form.errors
+        )
+        if has_field_errors:
+            return render(request, self.form_fragment, {"form": form})
+
+        # Credentials failed — return a clean form + fire toast
+        response = render(request, self.form_fragment, {"form": LoginForm()})
         response["HX-Trigger"] = json.dumps({
             "showToast": {
-                "message": "Usuario o contraseña incorrecto",
+                "message": "Usuario o contraseña incorrectos.",
                 "type": "danger"
             }
         })
@@ -38,7 +46,7 @@ class LoginView(View):
 
 class LogoutView(View):
     """Handles user logout"""
-    
+
     def post(self, request):
         logout(request)
         return redirect("login")

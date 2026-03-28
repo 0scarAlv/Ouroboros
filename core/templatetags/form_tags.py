@@ -1,6 +1,7 @@
 from django import template
 from django.utils.html import format_html, conditional_escape
 from django.utils.safestring import mark_safe
+from core.constants.general import ERROR_MESSAGES
 
 register = template.Library()
 
@@ -23,7 +24,8 @@ def render_field(field, label=None, placeholder=None):
     if field.errors:
         error_parts = []
         for error in field.errors:
-            escaped = conditional_escape(error)
+            traslated = ERROR_MESSAGES.get(str(error), str(error))
+            escaped = conditional_escape(traslated)
             error_parts.append(
                 f'<div class="invalid-feedback d-block">{escaped}</div>'
             )

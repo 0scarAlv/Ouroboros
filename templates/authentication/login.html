@@ -1,38 +1,19 @@
 {% extends "base.html" %}
-{% load form_tags %}
 
 {% block title %}Login — Ouroboros{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-4">
-
         <div class="card shadow-sm mt-5">
             <div class="card-body p-4">
 
                 <h4 class="card-title mb-4 text-center fw-bold">Iniciar sesión</h4>
 
-                <form
-                    hx-post="{% url 'login' %}"
-                    hx-target="this"
-                    hx-swap="none"
-                >
-                    {% csrf_token %}
-
-                    {% render_field form.username %}
-                    {% render_field form.password %}
-
-                    <div class="d-grid mt-3">
-                        <button type="submit" class="btn btn-dark">
-                            Ingresar
-                        </button>
-                    </div>
-
-                </form>
+                {% include "authentication/_login_form.html" %}
 
             </div>
         </div>
-
     </div>
 </div>
 {% endblock %}

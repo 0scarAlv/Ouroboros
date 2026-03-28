@@ -12,7 +12,7 @@ class LoginForm(BaseForm):
 
     password = forms.CharField(
         label="Contraseña",
-        widget=PasswordInput(attrs={"placeholder": "Ingresa tu usuario"})
+        widget=PasswordInput(attrs={"placeholder": "Ingresa tu contraseña"})
     )
 
     def clean(self):
@@ -31,4 +31,5 @@ class LoginForm(BaseForm):
     def get_user(self):
         """Returns the authenticated user after successful validation."""
         return getattr(self, "user", None)
+    
     

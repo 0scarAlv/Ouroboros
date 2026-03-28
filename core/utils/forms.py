@@ -91,7 +91,7 @@ DEFAULT_ERROR_CODES = {
 
 class BaseForm(forms.Form):
     """
-    Project base form
+    Project base form.
     Replaces Django default error messages with translatable error codes.
     """
 
@@ -99,17 +99,5 @@ class BaseForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         for field in self.fields.values():
-            
             for key, code in DEFAULT_ERROR_CODES.items():
-                if key in field.error_messages:
-                    field.error_messages[key] = code
-
-            if self.is_bound and field.widget.attrs.get("class"):
-                widget_name = None
-                for fname, f in self.fields.items():
-                    if f is field:
-                        widget_name = fname
-                        break
-                if widget_name and self.errors.get(widget_name):
-                    current = field.widget.attrs["class"]
-                    field.widget.attrs["class"] = current + " is-invalid"
+                field.error_messages[key] = code
