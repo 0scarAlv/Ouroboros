@@ -14,4 +14,15 @@ class Status(models.TextChoices):
     INACTIVE = 'inactive', 'Inctive'
     DELETED = 'deleted', 'Deleted'
 
-    
+# Human-readable Spanish translations for form error codes.
+ERROR_MESSAGES = {
+    "FIELD_REQUIRED":       "Este campo es obligatorio.",
+    "FIELD_INVALID":        "El valor ingresado no es válido.",
+    "FIELD_TOO_LONG":       "El valor ingresado es demasiado largo.",
+    "FIELD_TOO_SHORT":      "El valor ingresado es demasiado corto.",
+    "FIELD_TOO_LARGE":      "El valor ingresado es demasiado grande.",
+    "FIELD_TOO_SMALL":      "El valor ingresado es demasiado pequeño.",
+    "FIELD_INVALID_CHOICE": "La opción seleccionada no es válida.",
+    "FIELD_NOT_UNIQUE":     "Este valor ya existe, debe ser único.",
+    "INVALID_CREDENTIALS":  "Usuario o contraseña incorrectos.",
+}

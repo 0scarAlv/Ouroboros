@@ -1,0 +1,60 @@
+<!--
+    Sidebar navigation.
+    Receives sidebar_menu from context processor — already filtered by user permissions.
+    Never renders items the user cannot access.
+-->
+<div id="sidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3" style="width: 250px; min-width: 250px;">
+
+    <div class="fw-bold fs-5 mb-4 px-2">Ouroboros</div>
+
+    <nav class="nav flex-column gap-1">
+        {% for entry in sidebar_menu %}
+
+            {% if entry.children %}
+                <!--
+                    Section header with collapsible children.
+                    Uses Bootstrap collapse — no JS needed.
+                -->
+                <button
+                    class="btn btn-dark text-start d-flex align-items-center gap-2 px-2 py-2 w-100"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#menu-{{ entry.item.pk }}"
+                    aria-expanded="false"
+                >
+                    {% if entry.item.icon %}
+                        <i class="bi {{ entry.item.icon }}"></i>
+                    {% endif %}
+                    {{ entry.item.label }}
+                </button>
+
+                <div id="menu-{{ entry.item.pk }}" class="collapse ps-3">
+                    {% for child in entry.children %}
+                        
+                            href="{% if child.url_name %}{% url child.url_name %}{% else %}#{% endif %}"
+                            class="nav-link text-white-50 py-1 px-2"
+                        >
+                            {% if child.icon %}
+                                <i class="bi {{ child.icon }}"></i>
+                            {% endif %}
+                            {{ child.label }}
+                        </a>
+                    {% endfor %}
+                </div>
+
+            {% else %}
+                <!-- Standalone item with no children -->
+                
+                    href="{% if entry.item.url_name %}{% url entry.item.url_name %}{% else %}#{% endif %}"
+                    class="nav-link text-white px-2 py-2"
+                >
+                    {% if entry.item.icon %}
+                        <i class="bi {{ entry.item.icon }}"></i>
+                    {% endif %}
+                    {{ entry.item.label }}
+                </a>
+            {% endif %}
+
+        {% endfor %}
+    </nav>
+
+</div>

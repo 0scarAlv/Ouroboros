@@ -14,14 +14,14 @@ class AuditModel(BaseModel):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='%(app_label) %(class)s_created',
+        related_name='%(app_label)s_%(class)s_created',
     )
     updated_by = models.ForeignKey(
         get_user_model(),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='%(app_label)s %(class)s_updated',
+        related_name='%(app_label)s_%(class)s_updated',
     )
     deleted_at = models.DateTimeField(null=True, blank=True)
     deleted_by = models.ForeignKey(
@@ -29,7 +29,7 @@ class AuditModel(BaseModel):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name='%(app_label)s %(class)s_deleted',
+        related_name='%(app_label)s_%(class)s_deleted',
     )
 
     class Meta:

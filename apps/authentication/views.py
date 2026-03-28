@@ -12,7 +12,7 @@ class LoginView(View):
     def get(self, request):
         """Remder login form. Redirect if alredy authenticated"""
         if request.user.is_authenticated:
-            return redirect("/admin/")
+            return redirect("home")
         form = LoginForm()
         return render(request, self.template_name, {"form": form})
     
@@ -24,7 +24,7 @@ class LoginView(View):
             user = form.get_user()
             login(request, user)
             response = HttpResponse(status=200)
-            response["HX-Redirect"] = "/admin/"           
+            response["HX-Redirect"] = "/"
             return response
         response = HttpResponse(status=200)
         response["HX-Trigger"] = json.dumps({
