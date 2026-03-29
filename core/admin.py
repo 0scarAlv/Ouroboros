@@ -1,6 +1,7 @@
 from django.contrib import admin
 from core.models.menu_item import MenuItem
 from core.models.person import Person
+from core.models.address import Address
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
@@ -14,3 +15,10 @@ class PersonAdmin(admin.ModelAdmin):
     list_filter = ["person_type", "is_active"]
     search_fields = ["first_name", "last_name", "company_name", "dui", "tax_id", "email"]
     ordering = ["-created_at"]
+
+@admin.register(Address)
+class AddressAdmin(admin.ModelAdmin):
+    list_display = ["__str__", "person", "address_type", "city", "state", "is_primary"]
+    list_filter = ["address_type", "is_primary", "state"]
+    search_fields = ["street", "city", "state", "person__first_name", "person__company_name"]
+    ordering = ["-is_primary", "address_type"]

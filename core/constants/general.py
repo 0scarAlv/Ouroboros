@@ -39,3 +39,10 @@ class PersonRole(models.TextChoices):
     SUPPLIER = 'supplier', 'Proveedor'
     CONTACT = 'contact', 'Contacto'
     OTHER = 'other', 'Otro'
+
+class AdressType(models.TextChoices):
+    HOME = 'home', 'Domicilio'
+    WORK = 'work', 'Trabajo'
+    BREANCH = 'branch', 'Sucursal'
+    BILLING = 'billing', 'Facturación'
+    OTHER = 'other', 'Otro'
