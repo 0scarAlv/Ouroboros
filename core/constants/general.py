@@ -26,3 +26,16 @@ ERROR_MESSAGES = {
     "FIELD_NOT_UNIQUE":     "Este valor ya existe, debe ser único.",
     "INVALID_CREDENTIALS":  "Usuario o contraseña incorrectos.",
 }
+
+# Person type (individual/organization)
+class PersonType(models.TextChoices):
+    NATURAL = 'natural', 'Natural'
+    LEGAL = 'legal', 'Legal'
+
+# Person role quick classification tag
+class PersonRole(models.TextChoices):
+    CLIENTE = 'client', 'Cliente'
+    EMPLOYEE = 'employee', 'Empleado'
+    SUPPLIER = 'supplier', 'Proveedor'
+    CONTACT = 'contact', 'Contacto'
+    OTHER = 'other', 'Otro'
