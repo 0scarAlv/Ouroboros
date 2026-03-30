@@ -46,3 +46,11 @@ class AdressType(models.TextChoices):
     BREANCH = 'branch', 'Sucursal'
     BILLING = 'billing', 'Facturación'
     OTHER = 'other', 'Otro'
+
+class DocumentType(models.TextChoices):
+    DUI              = 'dui',              'DUI'
+    NIT              = 'nit',              'NIT'
+    CONTRACT         = 'contract',         'Contrato'
+    PROOF_OF_ADDRESS = 'proof_of_address', 'Comprobante de domicilio'
+    PROFILE_PHOTO    = 'profile_photo',    'Foto de perfil'
+    OTHER            = 'other',            'Otro'

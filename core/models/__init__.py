@@ -3,6 +3,7 @@ from .audit_model import AuditModel
 from .menu_item import MenuItem
 from .person import Person
 from .address import Address
+from .document import Document
 
 __all__ = [
     'BaseModel',
@@ -10,4 +11,5 @@ __all__ = [
     'MenuItem',
     'Person',
     'Address',
+    'Document',
 ]

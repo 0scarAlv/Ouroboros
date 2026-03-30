@@ -2,6 +2,7 @@ from django.contrib import admin
 from core.models.menu_item import MenuItem
 from core.models.person import Person
 from core.models.address import Address
+from core.models.document import Document
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
@@ -22,3 +23,10 @@ class AddressAdmin(admin.ModelAdmin):
     list_filter = ["address_type", "is_primary", "state"]
     search_fields = ["street", "city", "state", "person__first_name", "person__company_name"]
     ordering = ["-is_primary", "address_type"]
+
+@admin.register(Document)
+class DocumentAdmin(admin.ModelAdmin):
+    list_display  = ["__str__", "person", "document_type", "filename", "is_active"]
+    list_filter   = ["document_type", "is_active"]
+    search_fields = ["filename", "person__first_name", "person__company_name"]
+    ordering      = ["-created_at"]
