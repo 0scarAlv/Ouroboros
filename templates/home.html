@@ -3,5 +3,78 @@
 {% block title %}Inicio — Ouroboros{% endblock %}
 
 {% block content %}
-<h4 class="fw-bold">Bienvenido, {{ request.user.username }}</h4>
+
+<!-- Page header -->
+<div class="mb-4">
+    <h5 class="fw-bold mb-0">Bienvenido, {{ request.user.username }}</h5>
+    <small class="text-muted">Panel de administración</small>
+</div>
+
+<!-- Stats row -->
+<div class="row g-2 mb-4">
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded p-2 bg-primary bg-opacity-10">
+                    <i class="bi bi-box-seam fs-5 text-primary"></i>
+                </div>
+                <div>
+                    <div style="font-size: 11px; color: #555; text-transform: uppercase; font-weight: 600;">Productos</div>
+                    <div class="fw-bold fs-5">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded p-2 bg-success bg-opacity-10">
+                    <i class="bi bi-tags fs-5 text-success"></i>
+                </div>
+                <div>
+                    <div style="font-size: 11px; color: #555; text-transform: uppercase; font-weight: 600;">Categorías</div>
+                    <div class="fw-bold fs-5">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded p-2 bg-warning bg-opacity-10">
+                    <i class="bi bi-truck fs-5 text-warning"></i>
+                </div>
+                <div>
+                    <div style="font-size: 11px; color: #555; text-transform: uppercase; font-weight: 600;">Proveedores</div>
+                    <div class="fw-bold fs-5">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded p-2 bg-danger bg-opacity-10">
+                    <i class="bi bi-arrow-left-right fs-5 text-danger"></i>
+                </div>
+                <div>
+                    <div style="font-size: 11px; color: #555; text-transform: uppercase; font-weight: 600;">Movimientos</div>
+                    <div class="fw-bold fs-5">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Content card example -->
+<div class="card p-3">
+    <div class="fw-semibold mb-3" style="font-size: 13px;">Actividad reciente</div>
+    <p class="text-muted mb-0" style="font-size: 13px;">No hay actividad registrada.</p>
+</div>
+
 {% endblock %}

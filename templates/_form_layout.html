@@ -1,0 +1,35 @@
+<div class="card">
+
+    <!-- Form header -->
+    <div class="px-3 py-2 border-bottom d-flex align-items-center justify-content-between"
+         style="background: #f8f8f8; border-radius: var(--card-radius) var(--card-radius) 0 0;">
+        <span class="fw-semibold" style="font-size: 13px;">{{ title }}</span>
+    </div>
+
+    <!-- Form body -->
+    <div class="p-3">
+        <form
+            id="{{ form_id|default:'main-form' }}"
+            method="post"
+            {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
+        >
+            {% csrf_token %}
+
+            {% block form_fields %}{% endblock %}
+
+            <!-- Action buttons -->
+            <div class="d-flex gap-2 mt-3 pt-2 border-top">
+                <button type="submit" class="btn btn-primary btn-sm px-3">
+                    {{ submit_label|default:"Guardar" }}
+                </button>
+                {% if cancel_url %}
+                <a href="{{ cancel_url }}" class="btn btn-outline-secondary btn-sm px-3">
+                    Cancelar
+                </a>
+                {% endif %}
+            </div>
+
+        </form>
+    </div>
+
+</div>

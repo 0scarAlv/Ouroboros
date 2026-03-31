@@ -3,24 +3,28 @@
     Receives sidebar_menu from context processor — already filtered by user permissions.
     Never renders items the user cannot access.
 -->
-<div id="sidebar" class="d-flex flex-column bg-dark text-white vh-100 p-3" style="width: 250px; min-width: 250px;">
+<div id="sidebar"
+     class="d-flex flex-column text-white vh-100 p-3 flex-shrink-0"
+     style="width: var(--sidebar-width); background-color: var(--sidebar-bg);">
 
-    <div class="fw-bold fs-5 mb-4 px-2">Ouroboros</div>
+    <!-- Brand -->
+    <div class="fw-bold fs-6 mb-4 px-2 text-uppercase letter-spacing-1">
+        Ouroboros
+    </div>
 
     <nav class="nav flex-column gap-1">
         {% for entry in sidebar_menu %}
 
             {% if entry.children %}
                 <!--
-                    Section header with collapsible children.
-                    Uses Bootstrap collapse — no JS needed.
+                    Collapsible section — Bootstrap collapse, no custom JS.
                 -->
                 <button
-                    class="btn btn-dark text-start d-flex align-items-center gap-2 px-2 py-2 w-100"
+                    class="btn btn-sm text-start text-white d-flex align-items-center gap-2 px-2 py-1 w-100 border-0"
+                    style="background: transparent; font-size: 12px; opacity: .75;"
                     data-bs-toggle="collapse"
                     data-bs-target="#menu-{{ entry.item.pk }}"
-                    aria-expanded="false"
-                >
+                    aria-expanded="false">
                     {% if entry.item.icon %}
                         <i class="bi {{ entry.item.icon }}"></i>
                     {% endif %}
@@ -30,8 +34,9 @@
                 <div id="menu-{{ entry.item.pk }}" class="collapse ps-3">
                     {% for child in entry.children %}
                         
-                            href="{% if child.url_name %}{% url child.url_name %}{% else %}#{% endif %}"
-                            class="nav-link text-white-50 py-1 px-2"
+                        <a    href="{% if child.url_name %}{% url child.url_name %}{% else %}#{% endif %}"
+                            class="nav-link text-white py-1 px-2 d-flex align-items-center gap-2"
+                            style="font-size: 12px; opacity: .65;"
                         >
                             {% if child.icon %}
                                 <i class="bi {{ child.icon }}"></i>
@@ -42,10 +47,11 @@
                 </div>
 
             {% else %}
-                <!-- Standalone item with no children -->
+                <!-- Standalone item -->
                 
-                    href="{% if entry.item.url_name %}{% url entry.item.url_name %}{% else %}#{% endif %}"
-                    class="nav-link text-white px-2 py-2"
+                <a    href="{% if entry.item.url_name %}{% url entry.item.url_name %}{% else %}#{% endif %}"
+                    class="nav-link text-white px-2 py-1 d-flex align-items-center gap-2"
+                    style="font-size: 13px;"
                 >
                     {% if entry.item.icon %}
                         <i class="bi {{ entry.item.icon }}"></i>
