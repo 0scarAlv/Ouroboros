@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,45 +13,7 @@
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
         rel="stylesheet"
     >
-    <style>
-        /* Global design tokens — override per client via custom CSS */
-        :root {
-            --sidebar-bg:      #1a1a2e;
-            --sidebar-width:   240px;
-            --field-height:    30px;
-            --label-size:      11px;
-            --input-font-size: 13px;
-            --card-radius:     6px;
-        }
-
-        /* Inputs & selects — compact height */
-        .form-control,
-        .form-select {
-            height:    var(--field-height);
-            font-size: var(--input-font-size);
-            padding:   2px 8px;
-        }
-
-        textarea.form-control {
-            height: auto;
-        }
-
-        /* Labels — small and tight */
-        .form-label {
-            font-size:     var(--label-size);
-            margin-bottom: 2px;
-            font-weight:   600;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-            color: #555;
-        }
-
-        .card {
-            border-radius: var(--card-radius);
-            border:        1px solid #e0e0e0;
-            box-shadow:    0 1px 3px rgba(0,0,0,.06);
-        }
-    </style>
+    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     {% block extra_css %}{% endblock %}
     
 </head>
@@ -86,50 +49,7 @@
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
 
     <!-- Toast system -->
-    <script>
-        function showToast(message, type = "info") {
-            const container = document.getElementById("toast-container");
-
-            // Map type to Bootstrap bg utility class
-            const bgClass = {
-                success: "bg-success",
-                danger:  "bg-danger",
-                warning: "bg-warning",
-                info:    "bg-info",
-            }[type] || "bg-secondary";
-
-            const toastEl = document.createElement("div");
-            toastEl.className = `toast align-items-center text-white ${bgClass} border-0`;
-            toastEl.setAttribute("role", "alert");
-            toastEl.setAttribute("aria-live", "assertive");
-            toastEl.setAttribute("aria-atomic", "true");
-
-            toastEl.innerHTML = `
-                <div class="d-flex">
-                    <div class="toast-body fw-semibold">${message}</div>
-                    <button
-                        type="button"
-                        class="btn-close btn-close-white me-2 m-auto"
-                        data-bs-dismiss="toast"
-                        aria-label="Close">
-                    </button>
-                </div>
-            `;
-
-            container.appendChild(toastEl);
-
-            const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
-            toast.show();
-
-            toastEl.addEventListener("hidden.bs.toast", () => toastEl.remove());
-        }
-
-        // Listens for HTMX showToast event triggered via HX-Trigger response header
-        document.body.addEventListener("showToast", function (event) {
-            const { message, type } = event.detail;
-            showToast(message, type);
-        });
-    </script>
+    <script src="{% static 'js/main.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 
