@@ -1,0 +1,29 @@
+{% load form_tags %}
+
+<div class="border-top px-3 pt-3 pb-2">
+    <form
+        hx-post="{% url 'inventory:category-create' %}"
+        hx-target="#form-panel"
+        hx-swap="innerHTML"
+    >
+        {% csrf_token %}
+        <div class="row g-3 align-items-end">
+            <div class="col">
+                {% render_field form.name placeholder="Ej. Electrónica" %}
+            </div>
+            <div class="col">
+                {% render_field form.slug placeholder="ej. electronica" %}
+            </div>
+            <div class="col">
+                {% render_field form.description placeholder="Opcional" %}
+            </div>
+            <div class="col-auto d-flex align-items-end pb-1">
+                <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm ms-1"
+                        onclick="document.getElementById('form-panel').innerHTML=''">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

@@ -101,3 +101,14 @@ class BaseForm(forms.Form):
         for field in self.fields.values():
             for key, code in DEFAULT_ERROR_CODES.items():
                 field.error_messages[key] = code
+
+class BaseModelForm(forms.ModelForm):
+    """
+    Project base model form.
+    Replaces Django default error messages with translatable error codes.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            for key, code in DEFAULT_ERROR_CODES.items():
+                field.error_messages[key] = code

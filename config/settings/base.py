@@ -27,8 +27,10 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     'core',
-    "apps.authentication"
+    "apps.authentication",
+    'apps.inventory',
 ]
+LOGIN_URL = '/auth/login/'
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
