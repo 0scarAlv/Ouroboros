@@ -26,7 +26,7 @@
                     data-bs-target="#menu-{{ entry.item.pk }}"
                     aria-expanded="false">
                     {% if entry.item.icon %}
-                        <i class="bi {{ entry.item.icon }}"></i>
+                        <span class="icon" aria-hidden="true">{{ entry.item.icon }}</span>
                     {% endif %}
                     {{ entry.item.label }}
                 </button>
@@ -39,7 +39,7 @@
                             style="font-size: 12px; opacity: .65;"
                         >
                             {% if child.icon %}
-                                <i class="bi {{ child.icon }}"></i>
+                                <span class="icon" aria-hidden="true">{{ child.icon }}</span>
                             {% endif %}
                             {{ child.label }}
                         </a>
@@ -54,7 +54,7 @@
                     style="font-size: 13px;"
                 >
                     {% if entry.item.icon %}
-                        <i class="bi {{ entry.item.icon }}"></i>
+                        <span class="icon" aria-hidden="true">{{ entry.item.icon }}</span>
                     {% endif %}
                     {{ entry.item.label }}
                 </a>
