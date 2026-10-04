@@ -10,7 +10,7 @@ cd Ouroboros
 python -m venv .venv
 source .venv/bin/activate
 
-pip install -r requirements/base.txt
+pip install -r requirements/dev.txt
 # or requirements/postgres.txt to run on Postgres
 
 cp .env.example .env
@@ -23,6 +23,20 @@ python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
 ```
+
+## Tests
+
+Tests run with pytest (`manage.py test` misses pytest-style tests):
+
+```bash
+pytest                         # whole suite
+pytest apps/parties            # one module
+pytest --cov                   # with coverage report
+```
+
+Write new tests as plain pytest functions and build test data with the
+factory_boy factories in each app's `factories.py` (Spanish fake data
+via Faker). Uploaded files go to a temporary folder (see `conftest.py`).
 
 ## Requirements
 
