@@ -65,12 +65,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
+# One URL selects the engine, so each product picks what suits its client:
+# sqlite:///path/db.sqlite3, postgres://user:pass@host:5432/name, ...
+# Defaults to a local SQLite file for development.
 DATABASES = {
-    'default': dj_database_url.config(
-        default=(
-            f"postgres://{config('DB_USER')}:{config('DB_PASSWORD')}"
-            f"@{config('DB_HOST')}:{config('DB_PORT')}/{config('DB_NAME')}"
-        )
+    'default': dj_database_url.parse(
+        config('DATABASE_URL', default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
     )
 }
 

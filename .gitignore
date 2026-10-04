@@ -10,3 +10,5 @@ media/
 .idea/
 .DS_Store
 Thumbs.db
+db.sqlite3
+db.sqlite3-*
