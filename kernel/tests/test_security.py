@@ -23,3 +23,29 @@ def test_passwords_need_at_least_ten_characters():
 def test_session_lasts_a_fixed_eight_hour_shift():
     assert settings.SESSION_COOKIE_AGE == 8 * 60 * 60
     assert settings.SESSION_SAVE_EVERY_REQUEST is False
+
+
+def test_pages_send_security_headers(client):
+    response = client.get('/auth/login/')
+
+    csp = response['Content-Security-Policy']
+    assert "default-src 'self'" in csp
+    assert "frame-ancestors 'none'" in csp
+    assert 'camera=(self)' in response['Permissions-Policy']
+    assert response['X-Frame-Options'] == 'DENY'
+    assert response['X-Content-Type-Options'] == 'nosniff'
+    assert response['Referrer-Policy'] == 'same-origin'
+
+
+def test_pages_load_no_external_resources(client):
+    client.force_login(UserFactory())
+    html = client.get('/').content.decode()
+
+    assert 'https://' not in html and 'http://' not in html
+
+
+def test_htmx_sends_the_csrf_token(client):
+    client.force_login(UserFactory())
+    html = client.get('/').content.decode()
+
+    assert 'hx-headers=\'{"X-CSRFToken": "' in html

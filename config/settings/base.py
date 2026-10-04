@@ -48,6 +48,7 @@ if TESTING:
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'kernel.middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -118,6 +119,29 @@ AXES_LOCKOUT_CALLABLE = 'apps.authentication.views.locked_out'
 # axes.W006 recommends adding the IP to the lockout key; locking by username
 # alone is deliberate (see above).
 SILENCED_SYSTEM_CHECKS = ['axes.W006']
+
+# Security headers (every profile). All assets are served locally, so
+# the browser may only load code and styles from this server.
+# 'unsafe-eval': Alpine.js evaluates x-* expressions at runtime.
+# 'unsafe-inline' styles: templates and Bootstrap's JS set inline styles.
+CONTENT_SECURITY_POLICY = "; ".join([
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-eval'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "font-src 'self'",
+    "connect-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+])
+# Camera allowed for this site only (barcode scanning, needs HTTPS).
+PERMISSIONS_POLICY = "camera=(self), microphone=(), geolocation=(), payment=(), usb=()"
+X_FRAME_OPTIONS = 'DENY'
+SECURE_REFERRER_POLICY = 'same-origin'
+SESSION_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = True
 
 # Argon2 (OWASP recommendation) for new passwords; existing hashes are
 # upgraded on the user's next login.
