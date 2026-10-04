@@ -15,6 +15,11 @@ class LoginForm(BaseForm):
         widget=PasswordInput(attrs={"placeholder": "Ingresa tu contraseña"})
     )
 
+    def __init__(self, *args, request=None, **kwargs):
+        # The request lets django-axes count failed attempts per user.
+        self.request = request
+        super().__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         username = cleaned_data.get("username")
@@ -22,7 +27,7 @@ class LoginForm(BaseForm):
 
         
         if username and password:
-            self.user = authenticate(username=username, password=password)
+            self.user = authenticate(self.request, username=username, password=password)
             if self.user is None:
                 raise forms.ValidationError("INVALID_CREDENTIALS")
 

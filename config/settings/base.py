@@ -1,4 +1,5 @@
 import sys
+from datetime import timedelta
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
@@ -23,6 +24,7 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'simple_history',
+    'axes',
 ]
 
 LOCAL_APPS = [
@@ -53,6 +55,8 @@ MIDDLEWARE = [
     'kernel.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Must stay last: turns locked-out logins into the lockout response.
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -96,6 +100,23 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+AUTHENTICATION_BACKENDS = [
+    # Must stay first: rejects logins for locked-out accounts.
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Failed-login lockout (django-axes). Locks the username, wherever the
+# attempts come from: on a shared LAN many devices may share one IP.
+AXES_FAILURE_LIMIT = config('LOGIN_FAILURE_LIMIT', default=5, cast=int)
+AXES_COOLOFF_TIME = timedelta(minutes=config('LOGIN_LOCKOUT_MINUTES', default=15, cast=int))
+AXES_LOCKOUT_PARAMETERS = ['username']
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_CALLABLE = 'apps.authentication.views.locked_out'
+# axes.W006 recommends adding the IP to the lockout key; locking by username
+# alone is deliberate (see above).
+SILENCED_SYSTEM_CHECKS = ['axes.W006']
 
 # Argon2 (OWASP recommendation) for new passwords; existing hashes are
 # upgraded on the user's next login.

@@ -3,3 +3,4 @@ python-decouple>=3.8
 dj-database-url>=2.1
 django-simple-history>=3.8
 argon2-cffi>=25.1
+django-axes>=8.3

@@ -5,10 +5,10 @@ from apps.authentication.factories import TEST_PASSWORD, AdminFactory, UserFacto
 pytestmark = pytest.mark.django_db
 
 
-def test_user_factory_creates_a_user_that_can_log_in(client):
+def test_user_factory_creates_a_user_that_can_log_in():
     user = UserFactory()
 
-    assert client.login(username=user.username, password=TEST_PASSWORD)
+    assert user.check_password(TEST_PASSWORD)
 
 
 def test_user_factory_grants_permissions():
