@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
@@ -31,6 +32,11 @@ LOCAL_APPS = [
 LOGIN_URL = '/auth/login/'
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# Concrete models used only by the kernel tests.
+TESTING = sys.argv[1:2] == ['test'] or 'pytest' in sys.modules
+if TESTING:
+    INSTALLED_APPS += ['kernel.tests']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
