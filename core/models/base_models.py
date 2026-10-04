@@ -4,8 +4,8 @@ from django.db import models
 
 class BaseModel(models.Model):
     """
-    Abstract base model for all models in the project.
-    Provides UUID primary key, and creation/update timestamps.
+    Audit level 0: UUID primary key and creation/update timestamps.
+    Base for every model in the project.
     """
     id = models.UUIDField(
         primary_key=True,
