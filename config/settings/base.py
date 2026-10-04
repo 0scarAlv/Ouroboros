@@ -33,15 +33,16 @@ LOCAL_APPS = [
 # Optional modules: keep only the ones the product uses.
 MODULE_APPS = [
     "apps.parties",
+    "apps.attachments",
 ]
 LOGIN_URL = '/auth/login/'
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + MODULE_APPS
 
-# Concrete models used only by the kernel tests.
+# Concrete models used only by the tests of the kernel and modules.
 TESTING = sys.argv[1:2] == ['test'] or 'pytest' in sys.modules
 if TESTING:
-    INSTALLED_APPS += ['kernel.tests']
+    INSTALLED_APPS += ['kernel.tests', 'apps.attachments.tests']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -103,7 +104,12 @@ USE_TZ = True
 # Static files
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "kernel" / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles" 
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Uploaded files. They are never served by URL: attachments go through
+# their permission-checked download view.
+MEDIA_ROOT = config('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
+MEDIA_URL = '/media/'
 
 # Default primary key
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
