@@ -3,6 +3,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 
+from kernel.models import SecurityEvent
+
 from .models import Attachment
 from .permissions import can_view
 
@@ -26,6 +28,14 @@ def download(request, pk):
         raise Http404('El archivo ya no existe en el almacenamiento.')
 
     inline = request.GET.get('inline') == '1' and attachment.mime_type in INLINE_MIME_TYPES
+    SecurityEvent.record(
+        SecurityEvent.Kind.FILE_DOWNLOAD,
+        request,
+        attachment=str(attachment.pk),
+        name=attachment.original_name,
+        owner=f'{attachment.content_type.app_label}.{attachment.content_type.model}:{attachment.object_id}',
+        inline=inline,
+    )
     response = FileResponse(
         file,
         as_attachment=not inline,

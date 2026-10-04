@@ -202,3 +202,23 @@ class DownloadTests(MediaRootMixin, TestCase):
         self.attachment.soft_delete()
 
         self.assertEqual(self.client.get(self.url).status_code, 404)
+
+
+class DownloadLogTests(MediaRootMixin, TestCase):
+    def test_downloads_and_denials_are_recorded(self):
+        from kernel.models import SecurityEvent
+
+        attachment = Attachment.attach(Contract.objects.create(title='C'), upload())
+        url = reverse('attachments:download', args=[attachment.pk])
+        user = User.objects.create_user('ana', password='x')
+        self.client.force_login(user)
+
+        self.client.get(url)
+        user.user_permissions.add(*Permission.objects.filter(codename__in=['view_attachment', 'view_contract']))
+        self.client.get(url)
+
+        denied = SecurityEvent.objects.get(kind=SecurityEvent.Kind.PERMISSION_DENIED)
+        download = SecurityEvent.objects.get(kind=SecurityEvent.Kind.FILE_DOWNLOAD)
+        self.assertEqual(denied.path, url)
+        self.assertEqual(download.detail['attachment'], str(attachment.pk))
+        self.assertEqual(download.detail['name'], 'Contrato Ana López.pdf')
