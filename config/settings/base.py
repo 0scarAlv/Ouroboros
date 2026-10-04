@@ -83,13 +83,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='es')
+# Datetimes are stored in UTC (USE_TZ); this is only the display zone.
+TIME_ZONE = config('TIME_ZONE', default='America/El_Salvador')
 USE_I18N = True
 USE_TZ = True
-
-# Static files
-STATIC_URL = 'static/'
 
 # Static files
 STATIC_URL = 'static/'
