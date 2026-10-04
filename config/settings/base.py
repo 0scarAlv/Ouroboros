@@ -28,7 +28,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'core',
     "apps.authentication",
-    'apps.inventory',
 ]
 LOGIN_URL = '/auth/login/'
 
