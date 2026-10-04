@@ -1,6 +1,6 @@
 # Ouroboros
 
-Reusable enterprise core built with Django 4.2 + DRF.
+Reusable enterprise core built with Django 5.2 LTS + DRF.
 
 ## Getting Started
 ```bash
