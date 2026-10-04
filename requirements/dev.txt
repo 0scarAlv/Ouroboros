@@ -1,4 +1,4 @@
--r base.txt
+-r onprem.txt
 
 # Tests
 pytest>=9.1

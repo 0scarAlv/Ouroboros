@@ -38,6 +38,28 @@ Write new tests as plain pytest functions and build test data with the
 factory_boy factories in each app's `factories.py` (Spanish fake data
 via Faker). Uploaded files go to a temporary folder (see `conftest.py`).
 
+## Settings profiles
+
+| Profile | Use |
+|---|---|
+| `config.settings.dev` | Development (`manage.py` default) |
+| `config.settings.prod` | Server with a domain and HTTPS (`wsgi`/`asgi` default) |
+| `config.settings.onprem` | The client's own PC serving its local network, offline-capable |
+
+On-premise run (Windows or Linux, no Docker):
+
+```bash
+pip install -r requirements/onprem.txt
+set DJANGO_SETTINGS_MODULE=config.settings.onprem   # export on Linux
+python manage.py migrate
+python manage.py collectstatic --noinput
+python manage.py serve            # waitress on 0.0.0.0:8000
+```
+
+The database, uploads and logs live under `DATA_DIR`. The profile uses
+plain HTTP; waitress has no TLS, so HTTPS needs a proxy in front (e.g.
+Caddy with a local certificate) and `USE_HTTPS=True`.
+
 ## Requirements
 
 - Python 3.10+

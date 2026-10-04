@@ -49,6 +49,8 @@ if TESTING:
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'kernel.middleware.SecurityHeadersMiddleware',
+    # Serves static files without a web server in front (on-premise installs).
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -168,6 +170,13 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "kernel" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Compressed, cache-busted static files served by WhiteNoise.
+# Requires collectstatic; dev.py swaps in the plain storage.
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage'},
+}
 
 # Uploaded files. They are never served by URL: attachments go through
 # their permission-checked download view.

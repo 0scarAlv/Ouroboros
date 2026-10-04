@@ -17,3 +17,7 @@ db.sqlite3-*
 .coverage
 htmlcov/
 .pytest_cache/
+
+# On-premise instance data (database, uploads, logs)
+data/
+staticfiles/
