@@ -23,12 +23,12 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
+    'simple_history',
 ]
 
 LOCAL_APPS = [
     'core',
     "apps.authentication",
-    'apps.inventory',
 ]
 LOGIN_URL = '/auth/login/'
 
@@ -40,6 +40,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'core.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -66,12 +67,12 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
+# One URL selects the engine, so each product picks what suits its client:
+# sqlite:///path/db.sqlite3, postgres://user:pass@host:5432/name, ...
+# Defaults to a local SQLite file for development.
 DATABASES = {
-    'default': dj_database_url.config(
-        default=(
-            f"postgres://{config('DB_USER')}:{config('DB_PASSWORD')}"
-            f"@{config('DB_HOST')}:{config('DB_PORT')}/{config('DB_NAME')}"
-        )
+    'default': dj_database_url.parse(
+        config('DATABASE_URL', default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
     )
 }
 
@@ -84,13 +85,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = config('LANGUAGE_CODE', default='es')
+# Datetimes are stored in UTC (USE_TZ); this is only the display zone.
+TIME_ZONE = config('TIME_ZONE', default='America/El_Salvador')
 USE_I18N = True
 USE_TZ = True
-
-# Static files
-STATIC_URL = 'static/'
 
 # Static files
 STATIC_URL = 'static/'

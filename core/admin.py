@@ -1,6 +1,7 @@
 from django.contrib import admin
+from simple_history.admin import SimpleHistoryAdmin
 from core.models.menu_item import MenuItem
-from core.models.person import Person
+from core.models.person import Person, PersonRoleAssignment
 from core.models.address import Address
 from core.models.document import Document
 
@@ -10,8 +11,13 @@ class MenuItemAdmin(admin.ModelAdmin):
     list_filter = ["is_active", "parent"]
     ordering = ["parent", "order"]
 
+class PersonRoleAssignmentInline(admin.TabularInline):
+    model = PersonRoleAssignment
+    extra = 0
+
 @admin.register(Person)
-class PersonAdmin(admin.ModelAdmin):
+class PersonAdmin(SimpleHistoryAdmin):
+    inlines = [PersonRoleAssignmentInline]
     list_display = ["__str__","person_type","dui","tax_id","email","is_active"]
     list_filter = ["person_type", "is_active"]
     search_fields = ["first_name", "last_name", "company_name", "dui", "tax_id", "email"]

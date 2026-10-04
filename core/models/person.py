@@ -1,10 +1,9 @@
 from django.db import models
-from django.conf import settings
-from django.contrib.postgres.fields import ArrayField
-from core.models.audit_model import AuditModel
+from core.models.base_models import BaseModel
+from core.models.tracked_model import TrackedModel
 from core.constants.general import PersonType, PersonRole
 
-class Person(AuditModel):
+class Person(TrackedModel):
     person_type = models.CharField(
         max_length=10,
         choices=PersonType.choices,
@@ -23,16 +22,13 @@ class Person(AuditModel):
     email = models.EmailField(blank=True, null=True, unique=True)
     phone = models.CharField(max_length=20, blank=True, default='')
 
-    # classification tag 
-    roles = ArrayField(
-        models.CharField(max_length=20, choices=PersonRole.choices),
-        default=list,
-        blank=True,
-    )
     is_active = models.BooleanField(default=True)
 
     # User is opcional 28-03-2026-oscarlx
     notes = models.TextField(blank=True, default='')
+    def has_role(self, role):
+        return self.role_assignments.filter(role=role).exists()
+
     def __str__(self):
         if self.person_type == PersonType.LEGAL:
             return self.company_name or 'Legal entity'
@@ -43,4 +39,27 @@ class Person(AuditModel):
         verbose_name_plural = 'Personas'
         ordering = ['-created_at']
 
-    
+
+class PersonRoleAssignment(BaseModel):
+    """
+    Quick classification tag (client, supplier, employee...). A person can
+    hold several roles. Stored as rows instead of an array column so it works
+    on every database and stays filterable:
+    Person.objects.filter(role_assignments__role=PersonRole.SUPPLIER)
+    """
+    person = models.ForeignKey(
+        Person,
+        on_delete=models.CASCADE,
+        related_name='role_assignments',
+    )
+    role = models.CharField(max_length=20, choices=PersonRole.choices)
+
+    class Meta:
+        verbose_name = 'Rol de persona'
+        verbose_name_plural = 'Roles de persona'
+        constraints = [
+            models.UniqueConstraint(fields=['person', 'role'], name='unique_person_role'),
+        ]
+
+    def __str__(self):
+        return f'{self.person} — {self.get_role_display()}'
