@@ -1,6 +1,6 @@
 from simple_history.models import HistoricalRecords
 
-from core.current_user import get_current_user
+from kernel.current_user import get_current_user
 from .audit_model import AuditModel
 
 

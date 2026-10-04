@@ -1,4 +1,4 @@
-from core.current_user import acting_as
+from kernel.current_user import acting_as
 
 
 class CurrentUserMiddleware:

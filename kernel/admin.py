@@ -1,9 +1,9 @@
 from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
-from core.models.menu_item import MenuItem
-from core.models.person import Person, PersonRoleAssignment
-from core.models.address import Address
-from core.models.document import Document
+from kernel.models.menu_item import MenuItem
+from kernel.models.person import Person, PersonRoleAssignment
+from kernel.models.address import Address
+from kernel.models.document import Document
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):

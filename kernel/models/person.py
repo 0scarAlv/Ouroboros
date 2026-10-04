@@ -1,7 +1,7 @@
 from django.db import models
-from core.models.base_models import BaseModel
-from core.models.tracked_model import TrackedModel
-from core.constants.general import PersonType, PersonRole
+from kernel.models.base_models import BaseModel
+from kernel.models.tracked_model import TrackedModel
+from kernel.constants.general import PersonType, PersonRole
 
 class Person(TrackedModel):
     person_type = models.CharField(

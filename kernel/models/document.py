@@ -1,7 +1,7 @@
 from django.db import models
-from core.models.audit_model import AuditModel
-from core.models.person import Person
-from core.constants.general import DocumentType
+from kernel.models.audit_model import AuditModel
+from kernel.models.person import Person
+from kernel.constants.general import DocumentType
 
 
 

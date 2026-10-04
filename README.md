@@ -1,6 +1,6 @@
 # Ouroboros
 
-Reusable enterprise core built with Django 5.2 LTS.
+Reusable enterprise base built with Django 5.2 LTS.
 
 ## Getting Started
 ```bash

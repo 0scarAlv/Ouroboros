@@ -4,10 +4,10 @@ from django.db import IntegrityError
 from django.http import HttpResponse
 from django.test import RequestFactory, TestCase
 
-from core.constants.general import PersonRole
-from core.current_user import acting_as, get_current_user
-from core.middleware import CurrentUserMiddleware
-from core.models import Person, PersonRoleAssignment
+from kernel.constants.general import PersonRole
+from kernel.current_user import acting_as, get_current_user
+from kernel.middleware import CurrentUserMiddleware
+from kernel.models import Person, PersonRoleAssignment
 
 User = get_user_model()
 

@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import authenticate
-from core.utils.forms import BaseForm, TextInput, PasswordInput
+from kernel.utils.forms import BaseForm, TextInput, PasswordInput
 
 class LoginForm(BaseForm):
     """Autentication form."""

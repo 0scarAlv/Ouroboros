@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import Group
-from core.models.audit_model import AuditModel
+from kernel.models.audit_model import AuditModel
 
 class MenuItem(AuditModel):
     """

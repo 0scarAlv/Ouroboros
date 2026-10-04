@@ -1,7 +1,7 @@
 from django import template
 from django.utils.html import format_html, conditional_escape
 from django.utils.safestring import mark_safe
-from core.constants.general import ERROR_MESSAGES
+from kernel.constants.general import ERROR_MESSAGES
 
 register = template.Library()
 

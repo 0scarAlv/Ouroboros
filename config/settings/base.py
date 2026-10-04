@@ -25,7 +25,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    'core',
+    'kernel',
     "apps.authentication",
 ]
 LOGIN_URL = '/auth/login/'
@@ -38,7 +38,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'core.middleware.CurrentUserMiddleware',
+    'kernel.middleware.CurrentUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -56,7 +56,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.sidebar_menu',
+                'kernel.context_processors.sidebar_menu',
             ],
         },
     },
@@ -91,7 +91,7 @@ USE_TZ = True
 
 # Static files
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "core" / "static"]
+STATICFILES_DIRS = [BASE_DIR / "kernel" / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles" 
 
 # Default primary key

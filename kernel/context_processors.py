@@ -1,4 +1,4 @@
-from core.models.menu_item import MenuItem
+from kernel.models.menu_item import MenuItem
 
 
 def sidebar_menu(request):
