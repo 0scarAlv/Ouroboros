@@ -26,31 +26,3 @@ ERROR_MESSAGES = {
     "FIELD_NOT_UNIQUE":     "Este valor ya existe, debe ser único.",
     "INVALID_CREDENTIALS":  "Usuario o contraseña incorrectos.",
 }
-
-# Person type (individual/organization)
-class PersonType(models.TextChoices):
-    NATURAL = 'natural', 'Natural'
-    LEGAL = 'legal', 'Legal'
-
-# Person role quick classification tag
-class PersonRole(models.TextChoices):
-    CLIENTE = 'client', 'Cliente'
-    EMPLOYEE = 'employee', 'Empleado'
-    SUPPLIER = 'supplier', 'Proveedor'
-    CONTACT = 'contact', 'Contacto'
-    OTHER = 'other', 'Otro'
-
-class AdressType(models.TextChoices):
-    HOME = 'home', 'Domicilio'
-    WORK = 'work', 'Trabajo'
-    BREANCH = 'branch', 'Sucursal'
-    BILLING = 'billing', 'Facturación'
-    OTHER = 'other', 'Otro'
-
-class DocumentType(models.TextChoices):
-    DUI              = 'dui',              'DUI'
-    NIT              = 'nit',              'NIT'
-    CONTRACT         = 'contract',         'Contrato'
-    PROOF_OF_ADDRESS = 'proof_of_address', 'Comprobante de domicilio'
-    PROFILE_PHOTO    = 'profile_photo',    'Foto de perfil'
-    OTHER            = 'other',            'Otro'

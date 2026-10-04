@@ -29,9 +29,14 @@ LOCAL_APPS = [
     'kernel',
     "apps.authentication",
 ]
+
+# Optional modules: keep only the ones the product uses.
+MODULE_APPS = [
+    "apps.parties",
+]
 LOGIN_URL = '/auth/login/'
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS + MODULE_APPS
 
 # Concrete models used only by the kernel tests.
 TESTING = sys.argv[1:2] == ['test'] or 'pytest' in sys.modules
