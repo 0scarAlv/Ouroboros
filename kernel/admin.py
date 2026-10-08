@@ -3,9 +3,11 @@ from kernel.models import MenuItem, SecurityEvent
 
 @admin.register(MenuItem)
 class MenuItemAdmin(admin.ModelAdmin):
-    list_display = ["label", "parent", "order", "is_active"]
+    list_display = ["label", "parent", "url_name", "permission", "order", "is_active"]
     list_filter = ["is_active", "parent"]
     ordering = ["parent", "order"]
+    autocomplete_fields = ["parent"]
+    search_fields = ["label", "url_name"]
 
 
 @admin.register(SecurityEvent)
