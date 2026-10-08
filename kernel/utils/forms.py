@@ -102,13 +102,24 @@ class BaseForm(forms.Form):
             for key, code in DEFAULT_ERROR_CODES.items():
                 field.error_messages[key] = code
 
+def bootstrap_class(widget):
+    """Bootstrap 5 class for a Django widget."""
+    if isinstance(widget, (forms.CheckboxInput, forms.RadioSelect, forms.CheckboxSelectMultiple)):
+        return "form-check-input"
+    if isinstance(widget, forms.Select):
+        return "form-select"
+    return "form-control"
+
+
 class BaseModelForm(forms.ModelForm):
     """
     Project base model form.
-    Replaces Django default error messages with translatable error codes.
+    Replaces Django default error messages with translatable error codes and
+    gives widgets without a CSS class their Bootstrap class.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
+            field.widget.attrs.setdefault("class", bootstrap_class(field.widget))
             for key, code in DEFAULT_ERROR_CODES.items():
                 field.error_messages[key] = code
