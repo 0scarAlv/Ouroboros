@@ -24,6 +24,16 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
+## New modules
+
+```bash
+python manage.py startmodule products --model Product --audit 1
+```
+
+Creates `apps/products/` with a model, CRUD views, URLs, admin, factory
+and tests (audit level 0 = timestamps, 1 = who + soft delete, 2 = full
+history). Conventions are in `CLAUDE.md`.
+
 ## Tests
 
 Tests run with pytest (`manage.py test` misses pytest-style tests):
