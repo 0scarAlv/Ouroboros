@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}{{ crud.verbose_name_plural|capfirst }} — Ouroboros{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h5 class="fw-bold mb-0">{{ crud.verbose_name_plural|capfirst }}</h5>
+    {% if crud.can_add %}
+        <a href="{% url crud.urls.create %}" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
+            <span class="icon" aria-hidden="true">add</span> Nuevo
+        </a>
+    {% endif %}
+</div>
+
+<div class="card">
+    {% if searchable %}
+        <div class="p-2 border-bottom">
+            <!-- htmx swaps only the table; the URL keeps the search for reloads. -->
+            <input type="search" name="q" value="{{ query }}" placeholder="Buscar…"
+                   class="form-control form-control-sm"
+                   aria-label="Buscar"
+                   hx-get="{% url crud.urls.list %}"
+                   hx-trigger="input changed delay:300ms, search"
+                   hx-target="#crud-table"
+                   hx-push-url="true">
+        </div>
+    {% endif %}
+    <div id="crud-table">
+        {% include "crud/_list_table.html" %}
+    </div>
+</div>
+{% endblock %}

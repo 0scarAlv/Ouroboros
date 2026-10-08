@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de {{ object }} — Ouroboros{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% if crud.urls.detail %}{% url crud.urls.detail object.pk %}{% else %}{% url crud.urls.list %}{% endif %}"
+       class="small text-muted">{{ object }}</a>
+    <h5 class="fw-bold mb-0">Historial de cambios</h5>
+</div>
+
+<div class="card">
+    <ul class="list-group list-group-flush">
+        {% for entry in entries %}
+            <li class="list-group-item">
+                <div class="d-flex justify-content-between small">
+                    <span class="fw-semibold">
+                        {% if entry.record.history_type == "+" %}Creado{% elif entry.record.history_type == "-" %}Eliminado{% else %}Modificado{% endif %}
+                        {% if entry.record.history_user %}por {{ entry.record.history_user }}{% endif %}
+                    </span>
+                    <time class="text-muted" datetime="{{ entry.record.history_date|date:'c' }}">
+                        {{ entry.record.history_date|date:"SHORT_DATETIME_FORMAT" }}
+                    </time>
+                </div>
+                {% if entry.changes %}
+                    <ul class="small mb-0 mt-1">
+                        {% for change in entry.changes %}
+                            <li>{{ change.field|capfirst }}: <s class="text-muted">{{ change.old|default:"—" }}</s> → {{ change.new|default:"—" }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted small">Sin cambios registrados.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

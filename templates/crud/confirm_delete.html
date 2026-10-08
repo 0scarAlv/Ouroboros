@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar {{ object }} — Ouroboros{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 col-xl-6">
+        <div class="card p-3">
+            <h6 class="fw-bold">¿Eliminar {{ crud.verbose_name }} «{{ object }}»?</h6>
+            <p class="text-muted small mb-3">El registro dejará de aparecer en los listados.</p>
+            <form method="post" class="d-flex gap-2">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm px-3">Eliminar</button>
+                <a href="{% url crud.urls.list %}" class="btn btn-outline-secondary btn-sm px-3">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
