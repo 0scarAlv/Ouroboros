@@ -84,3 +84,14 @@ def test_lockout_without_htmx_returns_429(client):
     response = client.post(reverse('login'), {'username': user.username, 'password': TEST_PASSWORD})
 
     assert response.status_code == 429
+
+
+def test_pages_offer_a_logout_button_that_ends_the_session(client):
+    client.force_login(UserFactory())
+
+    page = client.get('/').content.decode()
+    assert 'action="/auth/logout/"' in page
+
+    response = client.post('/auth/logout/')
+    assert response.status_code == 302
+    assert client.get('/').status_code == 302

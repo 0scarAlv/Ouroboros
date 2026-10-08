@@ -63,4 +63,21 @@
         {% endfor %}
     </nav>
 
+    <!-- Signed-in user and logout (POST: a GET link could be triggered by any page). -->
+    <div class="mt-auto pt-3 border-top border-secondary">
+        <div class="px-2 mb-2 text-truncate" style="font-size: 12px; opacity: .75;">
+            <span class="icon" aria-hidden="true">person</span>
+            {{ request.user.get_full_name|default:request.user.username }}
+        </div>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="btn btn-sm text-start text-white d-flex align-items-center gap-2 px-2 py-1 w-100 border-0"
+                    style="background: transparent; font-size: 12px; opacity: .75;">
+                <span class="icon" aria-hidden="true">logout</span>
+                Cerrar sesión
+            </button>
+        </form>
+    </div>
+
 </div>
