@@ -17,7 +17,7 @@ function showToast(message, type = "info") {
 
     toastEl.innerHTML = `
         <div class="d-flex">
-            <div class="toast-body fw-semibold">${message}</div>
+            <div class="toast-body fw-semibold"></div>
             <button
                 type="button"
                 class="btn-close btn-close-white me-2 m-auto"
@@ -26,6 +26,8 @@ function showToast(message, type = "info") {
             </button>
         </div>
     `;
+    // textContent, never innerHTML: messages may contain user-entered text.
+    toastEl.querySelector(".toast-body").textContent = message;
 
     container.appendChild(toastEl);
 
@@ -39,4 +41,9 @@ function showToast(message, type = "info") {
 document.body.addEventListener("showToast", function (event) {
     const { message, type } = event.detail;
     showToast(message, type);
+});
+
+// Django messages rendered by base.html after a redirect
+document.querySelectorAll("#flash-messages li").forEach(function (item) {
+    showToast(item.textContent, item.dataset.type);
 });
