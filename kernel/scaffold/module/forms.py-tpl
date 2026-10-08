@@ -1,0 +1,9 @@
+from kernel.utils.forms import BaseModelForm
+
+from .models import {{ model }}
+
+
+class {{ model }}Form(BaseModelForm):
+    class Meta:
+        model = {{ model }}
+        fields = ['name', 'description']

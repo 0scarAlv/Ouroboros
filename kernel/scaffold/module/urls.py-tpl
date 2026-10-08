@@ -1,0 +1,14 @@
+from django.urls import path
+
+from . import views
+
+app_name = '{{ app_label }}'
+
+urlpatterns = [
+    path('', views.{{ model }}List.as_view(), name='{{ model_lower }}_list'),
+    path('new/', views.{{ model }}Create.as_view(), name='{{ model_lower }}_create'),
+    path('<uuid:pk>/', views.{{ model }}Detail.as_view(), name='{{ model_lower }}_detail'),
+    path('<uuid:pk>/edit/', views.{{ model }}Update.as_view(), name='{{ model_lower }}_update'),
+    path('<uuid:pk>/delete/', views.{{ model }}Delete.as_view(), name='{{ model_lower }}_delete'),
+{% if audit == 2 %}    path('<uuid:pk>/history/', views.{{ model }}History.as_view(), name='{{ model_lower }}_history'),
+{% endif %}]

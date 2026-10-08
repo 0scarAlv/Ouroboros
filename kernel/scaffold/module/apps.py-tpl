@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class {{ config_class }}(AppConfig):
+    name = '{{ package }}'
+    label = '{{ app_label }}'
+    verbose_name = '{{ app_label|capfirst }}'

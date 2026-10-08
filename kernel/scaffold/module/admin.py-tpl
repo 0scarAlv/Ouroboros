@@ -1,0 +1,10 @@
+from django.contrib import admin
+{% if audit == 2 %}from simple_history.admin import SimpleHistoryAdmin
+{% endif %}
+from .models import {{ model }}
+
+
+@admin.register({{ model }})
+class {{ model }}Admin({% if audit == 2 %}SimpleHistoryAdmin{% else %}admin.ModelAdmin{% endif %}):
+    list_display = ['name', 'created_at']
+    search_fields = ['name', 'description']

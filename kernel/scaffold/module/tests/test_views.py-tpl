@@ -1,0 +1,76 @@
+import pytest
+from django.urls import reverse
+
+from apps.authentication.factories import UserFactory
+from {{ package }}.factories import {{ model }}Factory
+from {{ package }}.models import {{ model }}
+
+pytestmark = pytest.mark.django_db
+
+PERMS = [f'{{ app_label }}.{action}_{{ model_lower }}' for action in ('view', 'add', 'change', 'delete')]
+
+
+@pytest.fixture
+def editor(client):
+    user = UserFactory(permissions=PERMS)
+    client.force_login(user)
+    return user
+
+
+def test_list_requires_the_view_permission(client):
+    client.force_login(UserFactory())
+
+    response = client.get(reverse('{{ app_label }}:{{ model_lower }}_list'))
+
+    assert response.status_code == 403
+
+
+def test_list_shows_records(client, editor):
+    record = {{ model }}Factory()
+
+    response = client.get(reverse('{{ app_label }}:{{ model_lower }}_list'))
+
+    assert record.name in response.content.decode()
+
+
+def test_create(client, editor):
+    client.post(reverse('{{ app_label }}:{{ model_lower }}_create'), {'name': 'Nuevo', 'description': ''})
+
+    assert {{ model }}.objects.filter(name='Nuevo').exists()
+
+
+def test_update(client, editor):
+    record = {{ model }}Factory()
+
+    client.post(
+        reverse('{{ app_label }}:{{ model_lower }}_update', args=[record.pk]),
+        {'name': 'Cambiado', 'description': ''},
+    )
+
+    record.refresh_from_db()
+    assert record.name == 'Cambiado'
+{% if audit >= 1 %}    assert record.updated_by == editor
+{% endif %}
+
+def test_delete(client, editor):
+    record = {{ model }}Factory()
+
+    client.post(reverse('{{ app_label }}:{{ model_lower }}_delete', args=[record.pk]))
+
+    assert not {{ model }}.objects.filter(pk=record.pk).exists()
+{% if audit >= 1 %}    assert {{ model }}.all_objects.get(pk=record.pk).deleted_by == editor
+{% endif %}{% if audit == 2 %}
+
+def test_history_records_who_changed_what(client, editor):
+    record = {{ model }}Factory(name='Antes')
+    client.post(
+        reverse('{{ app_label }}:{{ model_lower }}_update', args=[record.pk]),
+        {'name': 'Después', 'description': record.description},
+    )
+
+    response = client.get(reverse('{{ app_label }}:{{ model_lower }}_history', args=[record.pk]))
+
+    latest = response.context['entries'][0]
+    assert latest['record'].history_user == editor
+    assert [(c['old'], c['new']) for c in latest['changes']] == [('Antes', 'Después')]
+{% endif %}

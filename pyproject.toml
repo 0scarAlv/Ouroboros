@@ -3,6 +3,9 @@ DJANGO_SETTINGS_MODULE = "config.settings.dev"
 testpaths = ["kernel", "apps"]
 python_files = ["test_*.py"]
 addopts = "-ra --strict-markers"
+markers = [
+    "slow: runs in a separate process (deselect with -m 'not slow')",
+]
 
 [tool.coverage.run]
 source = ["kernel", "apps"]

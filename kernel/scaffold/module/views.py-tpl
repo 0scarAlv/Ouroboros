@@ -1,0 +1,42 @@
+from kernel.views import (
+    CrudCreateView,
+    CrudDeleteView,
+    CrudDetailView,
+{% if audit == 2 %}    CrudHistoryView,
+{% endif %}    CrudListView,
+    CrudUpdateView,
+)
+
+from .forms import {{ model }}Form
+from .models import {{ model }}
+
+
+class {{ model }}ViewMixin:
+    model = {{ model }}
+    form_class = {{ model }}Form
+
+
+class {{ model }}List({{ model }}ViewMixin, CrudListView):
+    search_fields = ['name', 'description']
+    list_display = ['name', 'description']
+
+
+class {{ model }}Detail({{ model }}ViewMixin, CrudDetailView):
+    pass
+
+
+class {{ model }}Create({{ model }}ViewMixin, CrudCreateView):
+    pass
+
+
+class {{ model }}Update({{ model }}ViewMixin, CrudUpdateView):
+    pass
+
+
+class {{ model }}Delete({{ model }}ViewMixin, CrudDeleteView):
+    pass
+{% if audit == 2 %}
+
+class {{ model }}History({{ model }}ViewMixin, CrudHistoryView):
+    pass
+{% endif %}

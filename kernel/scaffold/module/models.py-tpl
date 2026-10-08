@@ -1,0 +1,19 @@
+from django.db import models
+
+from kernel.models import {{ base_class }}
+
+
+class {{ model }}({{ base_class }}):
+    """
+    {{ base_class }} gives {{ audit_summary }}.
+    """
+
+    name = models.CharField('nombre', max_length=150)
+    description = models.TextField('descripción', blank=True, default='')
+
+    class Meta({{ base_class }}.Meta):
+        verbose_name = '{{ model_lower }}'
+        verbose_name_plural = '{{ model_lower }}s'
+
+    def __str__(self):
+        return self.name
