@@ -1,0 +1,10 @@
+{# Close button of a panel header: closes the panel in place, or goes back to the list on a full page. #}
+{% if in_panel %}
+    <button type="button" class="btn-icon" data-crud-close aria-label="Cerrar" title="Cerrar (Esc)">
+        <span class="icon" aria-hidden="true">close</span>
+    </button>
+{% else %}
+    <a href="{% url crud.urls.list %}" class="btn-icon" aria-label="Cerrar" title="Cerrar">
+        <span class="icon" aria-hidden="true">close</span>
+    </a>
+{% endif %}

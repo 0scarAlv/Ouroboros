@@ -1,0 +1,33 @@
+{% load crud_tags %}
+<section class="panel" aria-labelledby="crud-detail-title">
+    <header class="panel__header">
+        <h2 class="panel__title" id="crud-detail-title">{{ object }}</h2>
+        {% include "crud/_panel_close.html" %}
+    </header>
+
+    <div class="panel__body">
+        <dl class="field-list">
+            {% for name in detail_fields %}
+                <dt>{% field_label view.model name as label %}{{ label|capfirst }}</dt>
+                <dd>{% field_value object name as value %}{% if value == "" %}—{% else %}{{ value }}{% endif %}</dd>
+            {% endfor %}
+        </dl>
+    </div>
+
+    <div class="panel__actions">
+        {% if not in_panel %}
+            {# On the list page these actions are in the toolbar. #}
+            {% if crud.can_change %}
+                <a href="{% url crud.urls.update object.pk %}" class="btn btn-tool btn-sm">
+                    <span class="icon" aria-hidden="true">edit</span>Modificar
+                </a>
+            {% endif %}
+            {% if crud.has_history %}
+                <a href="{% url crud.urls.history object.pk %}" class="btn btn-tool btn-sm">
+                    <span class="icon" aria-hidden="true">history</span>Historial
+                </a>
+            {% endif %}
+        {% endif %}
+        {% include "crud/_audit_meta.html" %}
+    </div>
+</section>

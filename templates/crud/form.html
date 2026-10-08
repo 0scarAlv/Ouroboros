@@ -3,9 +3,8 @@
 {% block title %}{{ title }} — Ouroboros{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 col-xl-6">
-        {% include "crud/_form_card.html" %}
-    </div>
+{% include "crud/_page_back.html" %}
+<div class="page-panel">
+    {% include panel_template %}
 </div>
 {% endblock %}

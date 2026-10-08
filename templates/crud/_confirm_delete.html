@@ -1,0 +1,28 @@
+<section class="panel panel--danger" aria-labelledby="crud-delete-title">
+    <header class="panel__header">
+        <h2 class="panel__title" id="crud-delete-title">Eliminar {{ crud.verbose_name }}</h2>
+        {% include "crud/_panel_close.html" %}
+    </header>
+
+    <form method="post"
+          {% if in_panel %}hx-post="{{ request.get_full_path }}" hx-target="#crud-panel-body" hx-swap="innerHTML" hx-disabled-elt="find button[type='submit']"{% endif %}>
+        {% csrf_token %}
+        <div class="panel__body">
+            <p class="mb-1">¿Eliminar «{{ object }}»?</p>
+            <p class="panel__meta mb-0">
+                {% if soft_delete %}El registro dejará de aparecer en los listados.{% else %}El registro se borrará definitivamente.{% endif %}
+            </p>
+        </div>
+        <div class="panel__actions">
+            <button type="submit" class="btn btn-danger btn-sm">
+                <span class="icon" aria-hidden="true">delete</span>Eliminar
+            </button>
+            {# Focus starts on Cancel: a stray Enter must not delete. #}
+            {% if in_panel %}
+                <button type="button" class="btn btn-tool btn-sm" data-crud-close autofocus>Cancelar</button>
+            {% else %}
+                <a href="{% url crud.urls.list %}" class="btn btn-tool btn-sm" autofocus>Cancelar</a>
+            {% endif %}
+        </div>
+    </form>
+</section>

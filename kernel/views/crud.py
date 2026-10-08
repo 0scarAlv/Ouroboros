@@ -12,14 +12,23 @@ permission get a 403, which is recorded as a security event.
 
 Templates live in templates/crud/ and can be overridden per model by adding
 templates/<app_label>/<model_name>_<suffix>.html.
+
+The list page opens detail, forms, delete confirmation and history in a
+panel above the table through htmx. An htmx request to those views gets only
+the panel partial (crud/_<suffix>.html, overridable per model with
+templates/<app_label>/_<model_name>_<suffix>.html); the full pages include
+the same partial, so a direct URL keeps working without JavaScript. A
+successful create, update or delete from the panel answers 204 with an
+HX-Trigger header (a toast plus `crudChanged`) instead of a redirect.
 """
+import json
 import uuid
 
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import NoReverseMatch, reverse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
@@ -43,6 +52,15 @@ class CrudMixin(PermissionRequiredMixin):
     permission_action = None
     template_suffix = None
 
+    @property
+    def is_htmx(self):
+        return bool(self.request.headers.get('HX-Request'))
+
+    @property
+    def in_panel(self):
+        """htmx requests to every view but the list load it into the list page's panel."""
+        return self.is_htmx and self.template_suffix != 'list'
+
     def get_permission_required(self):
         opts = self.model._meta
         return [f'{opts.app_label}.{self.permission_action}_{opts.model_name}']
@@ -52,11 +70,32 @@ class CrudMixin(PermissionRequiredMixin):
         return f'{opts.app_label}:{opts.model_name}_{action}'
 
     def get_template_names(self):
+        if self.in_panel:
+            return self.get_panel_template_names()
         opts = self.model._meta
         return [
             f'{opts.app_label}/{opts.model_name}_{self.template_suffix}.html',
             f'crud/{self.template_suffix}.html',
         ]
+
+    def get_panel_template_names(self):
+        """Partial with the view's content, shared by the panel and the full page."""
+        opts = self.model._meta
+        return [
+            f'{opts.app_label}/_{opts.model_name}_{self.template_suffix}.html',
+            f'crud/_{self.template_suffix}.html',
+        ]
+
+    def changed_response(self, message, action, pk):
+        """
+        Answer to a successful change made from the panel: no content, and an
+        HX-Trigger header that shows the toast and tells the page to close the
+        panel and reload the table. json.dumps keeps the header ASCII.
+        """
+        trigger = {'crudChanged': {'action': action, 'pk': str(pk)}}
+        if message:
+            trigger['showToast'] = {'message': message, 'type': 'success'}
+        return HttpResponse(status=204, headers={'HX-Trigger': json.dumps(trigger)})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -79,6 +118,9 @@ class CrudMixin(PermissionRequiredMixin):
             'can_delete': 'delete' in urls and user.has_perm(f'{opts.app_label}.delete_{opts.model_name}'),
             'has_history': 'history' in urls and hasattr(self.model, 'history'),
         }
+        context['in_panel'] = self.in_panel
+        if self.template_suffix != 'list':
+            context['panel_template'] = self.get_panel_template_names()
         return context
 
 
@@ -107,9 +149,23 @@ class CrudListView(CrudMixin, ListView):
         return queryset
 
     def get_template_names(self):
-        if self.request.headers.get('HX-Request'):
+        # On the list page htmx only reloads the table (search, paging, after a change).
+        if self.is_htmx:
             return [self.partial_template_name]
         return super().get_template_names()
+
+    def paginate_queryset(self, queryset, page_size):
+        """
+        Like ListView, but an out-of-range page shows the last one instead of
+        a 404: deleting the only record of the last page reloads the table
+        with the same URL.
+        """
+        paginator = self.get_paginator(
+            queryset, page_size, orphans=self.get_paginate_orphans(),
+            allow_empty_first_page=self.get_allow_empty(),
+        )
+        page = paginator.get_page(self.request.GET.get(self.page_kwarg))
+        return paginator, page, page.object_list, page.has_other_pages()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -150,9 +206,13 @@ class CrudFormMixin(CrudMixin):
         return reverse(self.url_name('list'))
 
     def form_valid(self, form):
+        message = self.success_message
+        if self.in_panel:
+            self.object = form.save()
+            return self.changed_response(message.format(object=self.object), self.panel_action, self.object.pk)
         response = super().form_valid(form)
-        if self.success_message:
-            messages.success(self.request, self.success_message.format(object=self.object))
+        if message:
+            messages.success(self.request, message.format(object=self.object))
         return response
 
     def get_context_data(self, **kwargs):
@@ -165,6 +225,7 @@ class CrudFormMixin(CrudMixin):
 
 class CrudCreateView(CrudFormMixin, CreateView):
     permission_action = 'add'
+    panel_action = 'create'
     success_message = 'Registro «{object}» creado.'
     title = 'Nuevo {verbose_name}'
     submit_label = 'Crear'
@@ -172,8 +233,9 @@ class CrudCreateView(CrudFormMixin, CreateView):
 
 class CrudUpdateView(CrudFormMixin, UpdateView):
     permission_action = 'change'
+    panel_action = 'update'
     success_message = 'Registro «{object}» actualizado.'
-    title = 'Editar {verbose_name}'
+    title = 'Modificar {verbose_name}'
     submit_label = 'Guardar cambios'
 
 
@@ -190,13 +252,22 @@ class CrudDeleteView(CrudMixin, DetailView):
     def get_success_url(self):
         return reverse(self.url_name('list'))
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['soft_delete'] = isinstance(self.object, AuditModel)
+        return context
+
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        pk = self.object.pk  # delete() clears it on records deleted for real
         if isinstance(self.object, AuditModel):
             self.object.soft_delete(request.user)
         else:
             self.object.delete()
-        messages.success(request, self.success_message.format(object=self.object))
+        message = self.success_message.format(object=self.object)
+        if self.in_panel:
+            return self.changed_response(message, 'delete', pk)
+        messages.success(request, message)
         return HttpResponseRedirect(self.get_success_url())
 
 

@@ -72,6 +72,14 @@ passing: it generates a module per audit level and runs its tests.
   templates only offer the ones that exist).
 - Override a CRUD template per model with
   `templates/<app_label>/<model_name>_<list|detail|form|confirm_delete|history>.html`.
+- The list page has one toolbar (Nuevo, Modificar, Eliminar, Historial, Ver)
+  acting on the selected row; detail, forms, delete and history open via
+  htmx in a panel above the table (`kernel/static/js/crud.js`). An htmx
+  request to those views returns only the partial
+  `crud/_<detail|form|confirm_delete|history>.html`, overridable with
+  `templates/<app_label>/_<model_name>_<suffix>.html`; the full pages
+  include the same partial. A successful change from the panel answers 204
+  with `HX-Trigger` (`showToast`, `crudChanged`) instead of a redirect.
 - Access is given with groups holding Django permissions. The sidebar menu
   (`kernel.MenuItem`) is configured per install in the admin; each item
   points to one permission.

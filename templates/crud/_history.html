@@ -1,0 +1,33 @@
+<section class="panel" aria-labelledby="crud-history-title">
+    <header class="panel__header">
+        <h2 class="panel__title" id="crud-history-title">Historial de cambios · {{ object }}</h2>
+        {% include "crud/_panel_close.html" %}
+    </header>
+
+    <div class="panel__body panel__body--scroll">
+        <ul class="history-list">
+            {% for entry in entries %}
+                <li>
+                    <div class="history-list__head">
+                        <span class="fw-semibold">
+                            {% if entry.record.history_type == "+" %}Creado{% elif entry.record.history_type == "-" %}Eliminado{% else %}Modificado{% endif %}
+                            {% if entry.record.history_user %}por {{ entry.record.history_user }}{% endif %}
+                        </span>
+                        <time class="text-muted tabular" datetime="{{ entry.record.history_date|date:'c' }}">
+                            {{ entry.record.history_date|date:"SHORT_DATETIME_FORMAT" }}
+                        </time>
+                    </div>
+                    {% if entry.changes %}
+                        <ul class="history-list__changes">
+                            {% for change in entry.changes %}
+                                <li>{{ change.field|capfirst }}: <s class="text-muted">{{ change.old|default:"—" }}</s> → {{ change.new|default:"—" }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% empty %}
+                <li class="text-muted">Sin cambios registrados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</section>

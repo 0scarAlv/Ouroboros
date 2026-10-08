@@ -60,8 +60,8 @@ def test_generated_modules_pass_their_own_tests(tmp_path):
          '-o', 'addopts=', '--ds=scaffold_settings', *(str(tmp_path / name) for name in LEVELS)],
         cwd=tmp_path, env=env,
     )
-    # 5 tests at level 0 and 1, 6 at level 2 (history).
-    assert '16 passed' in result.stdout, result.stdout
+    # 6 tests at level 0 and 1, 7 at level 2 (history).
+    assert '19 passed' in result.stdout, result.stdout
 
 
 def test_generated_module_uses_the_requested_audit_level(tmp_path):

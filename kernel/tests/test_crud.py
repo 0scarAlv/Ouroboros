@@ -1,10 +1,13 @@
+import json
+import re
+
 import pytest
 from django.urls import reverse
 
 from apps.authentication.factories import AdminFactory, UserFactory
 from kernel.models import SecurityEvent
 
-from .models import PlainNote, TrackedNote
+from .models import AuditedNote, PlainNote, TrackedNote
 
 pytestmark = [pytest.mark.django_db, pytest.mark.urls('kernel.tests.urls')]
 
@@ -164,3 +167,162 @@ def test_history_lists_changes_with_who_made_them(client, editor, note):
     assert first['record'].history_type == '+'
 
 
+# -- List page: one toolbar acting on the selected row, panel above the table --
+
+HX = {'HTTP_HX_REQUEST': 'true'}
+
+
+def _toolbar_actions(body):
+    return set(re.findall(r'data-crud-action="(\w+)"', body))
+
+
+def test_list_has_one_toolbar_and_no_per_row_buttons(client, editor, note):
+    response = client.get(reverse('kernel_tests:trackednote_list'))
+
+    body = response.content.decode()
+    assert _toolbar_actions(body) == {'create', 'update', 'delete', 'history'}
+    assert 'id="crud-panel-body"' in body
+    # Each row carries its action URLs as data, never as buttons or links.
+    tbody = body.split('<tbody>')[1].split('</tbody>')[0]
+    assert f'data-update-url="{reverse("kernel_tests:trackednote_update", args=[note.pk])}"' in tbody
+    assert f'data-delete-url="{reverse("kernel_tests:trackednote_delete", args=[note.pk])}"' in tbody
+    assert '<a ' not in tbody and '<button' not in tbody
+
+
+def test_toolbar_only_offers_permitted_actions(client, note):
+    client.force_login(UserFactory(permissions=['kernel_tests.view_trackednote']))
+
+    body = client.get(reverse('kernel_tests:trackednote_list')).content.decode()
+
+    # Without change permission, Ver replaces Modificar.
+    assert _toolbar_actions(body) == {'history', 'detail'}
+    assert 'data-update-url' not in body
+    assert 'data-delete-url' not in body
+    assert 'data-crud-default="detail"' in body
+
+
+def test_list_without_other_routes_offers_no_actions(client):
+    record = AuditedNote.objects.create(title='Sola')
+    client.force_login(AdminFactory())
+
+    body = client.get(reverse('kernel_tests:auditednote_list')).content.decode()
+
+    assert _toolbar_actions(body) == set()
+    assert f'data-pk="{record.pk}"' in body
+    assert 'data-crud-default=""' in body
+
+
+@pytest.mark.parametrize('route', ['create', 'update', 'delete', 'history', 'detail'])
+def test_htmx_requests_get_the_panel_partial(client, editor, note, route):
+    args = [] if route == 'create' else [note.pk]
+    url = reverse(f'kernel_tests:trackednote_{route}', args=args)
+
+    panel = client.get(url, **HX).content.decode()
+    page = client.get(url).content.decode()
+
+    assert '<html' not in panel
+    assert 'class="panel' in panel
+    assert 'data-crud-close' in panel
+    # The full page wraps the same partial and works without htmx.
+    assert '<html' in page
+    assert 'class="panel' in page
+    assert 'data-crud-close' not in page
+    assert 'hx-post' not in page
+    if route in ('create', 'update', 'delete'):
+        assert f'hx-post="{url}"' in panel
+
+
+def test_htmx_create_answers_204_with_a_toast_and_no_message(client, editor):
+    response = client.post(
+        reverse('kernel_tests:trackednote_create'), {'title': '<b>Nueva</b>', 'code': 'N1'}, **HX,
+    )
+
+    created = TrackedNote.objects.get(code='N1')
+    assert response.status_code == 204
+    header = response['HX-Trigger']
+    assert header.isascii()
+    trigger = json.loads(header)
+    assert trigger['showToast'] == {'message': 'Registro «<b>Nueva</b>» creado.', 'type': 'success'}
+    assert trigger['crudChanged'] == {'action': 'create', 'pk': str(created.pk)}
+    # The toast replaces the flash message: nothing is left for the next page.
+    assert list(client.get(reverse('kernel_tests:trackednote_list')).context['messages']) == []
+
+
+def test_htmx_invalid_form_is_shown_again_in_the_panel(client, editor):
+    url = reverse('kernel_tests:trackednote_create')
+
+    response = client.post(url, {'title': ''}, **HX)
+
+    body = response.content.decode()
+    assert response.status_code == 200
+    assert 'HX-Trigger' not in response
+    assert '<html' not in body
+    assert 'Este campo es obligatorio.' in body
+    assert f'hx-post="{url}"' in body
+
+
+def test_htmx_update_answers_204(client, editor, note):
+    response = client.post(
+        reverse('kernel_tests:trackednote_update', args=[note.pk]), {'title': 'Editada', 'code': 'A1'}, **HX,
+    )
+
+    note.refresh_from_db()
+    assert response.status_code == 204
+    assert note.title == 'Editada'
+    assert json.loads(response['HX-Trigger'])['crudChanged'] == {'action': 'update', 'pk': str(note.pk)}
+
+
+def test_htmx_delete_answers_204_with_the_deleted_pk(client):
+    note = PlainNote.objects.create(title='Temporal')
+    pk = note.pk
+    client.force_login(UserFactory(permissions=['kernel_tests.delete_plainnote']))
+
+    response = client.post(reverse('kernel_tests:plainnote_delete', args=[pk]), **HX)
+
+    assert response.status_code == 204
+    trigger = json.loads(response['HX-Trigger'])
+    assert trigger['crudChanged'] == {'action': 'delete', 'pk': str(pk)}
+    assert trigger['showToast']['type'] == 'success'
+    assert not PlainNote.objects.filter(pk=pk).exists()
+
+
+def test_delete_confirmation_says_whether_the_record_is_kept(client, editor, note):
+    tracked = client.get(reverse('kernel_tests:trackednote_delete', args=[note.pk]), **HX)
+    plain_note = PlainNote.objects.create(title='Temporal')
+    client.force_login(AdminFactory())
+    plain = client.get(reverse('kernel_tests:plainnote_delete', args=[plain_note.pk]), **HX)
+
+    assert 'dejará de aparecer en los listados' in tracked.content.decode()
+    assert 'se borrará definitivamente' in plain.content.decode()
+
+
+def test_out_of_range_page_shows_the_last_one(client, editor):
+    for n in range(3):
+        TrackedNote.objects.create(title=f'Nota {n}')
+
+    response = client.get(reverse('kernel_tests:trackednote_list'), {'page': 9}, **HX)
+
+    assert response.status_code == 200
+    assert response.context['page_obj'].number == 2
+
+
+def test_toolbar_buttons_carry_what_the_cancel_toggle_needs(client, editor):
+    body = client.get(reverse('kernel_tests:trackednote_list')).content.decode()
+
+    buttons = re.findall(r'<(?:a|button) [^>]*data-crud-action="[^"]*"[^>]*>', body)
+    assert len(buttons) == 4
+    for button in buttons:
+        # crud.js swaps the label/icon to "Cancelar" and restores them from these.
+        assert 'aria-controls="crud-panel"' in button
+        assert 'aria-expanded="false"' in button
+        assert re.search(r'data-label="\w+"', button)
+        assert re.search(r'data-icon="\w+"', button)
+    labels = dict(re.findall(r'data-label="(\w+)" data-icon="\w+" data-crud-action="(\w+)"', body))
+    assert labels == {'Nuevo': 'create', 'Modificar': 'update', 'Eliminar': 'delete', 'Historial': 'history'}
+    assert body.count('data-crud-label>') == 4 and body.count('data-crud-icon>') == 4
+
+
+def test_panel_forms_keep_their_own_cancel_button(client, editor, note):
+    for route, args in (('create', []), ('update', [note.pk]), ('delete', [note.pk])):
+        body = client.get(reverse(f'kernel_tests:trackednote_{route}', args=args), **HX).content.decode()
+        assert re.search(r'<button type="button" class="btn btn-tool btn-sm" data-crud-close[^>]*>Cancelar</button>', body)

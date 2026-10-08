@@ -41,3 +41,18 @@ def field_value(obj, name):
     if isinstance(field, models.DateField):
         return format_date(value)
     return value
+
+
+NUMERIC_FIELDS = (models.IntegerField, models.DecimalField, models.FloatField)
+
+
+@register.simple_tag
+def column_class(model, name):
+    """'num' for numeric columns (right-aligned, tabular figures), else ''."""
+    try:
+        field = model._meta.get_field(name)
+    except FieldDoesNotExist:
+        return ''
+    if isinstance(field, NUMERIC_FIELDS) and not field.choices and not field.is_relation:
+        return 'num'
+    return ''

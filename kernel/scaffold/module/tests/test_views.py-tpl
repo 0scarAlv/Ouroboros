@@ -39,6 +39,17 @@ def test_create(client, editor):
     assert {{ model }}.objects.filter(name='Nuevo').exists()
 
 
+def test_create_from_the_list_panel(client, editor):
+    response = client.post(
+        reverse('{{ app_label }}:{{ model_lower }}_create'), {'name': 'Panel', 'description': ''},
+        HTTP_HX_REQUEST='true',
+    )
+
+    assert response.status_code == 204
+    assert 'crudChanged' in response['HX-Trigger']
+    assert {{ model }}.objects.filter(name='Panel').exists()
+
+
 def test_update(client, editor):
     record = {{ model }}Factory()
 

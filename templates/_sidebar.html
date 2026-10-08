@@ -1,83 +1,82 @@
-<!--
+{% load ui_tags %}
+{% comment %}
     Sidebar navigation.
-    Receives sidebar_menu from the context processor, already filtered by the user's permissions.
-    Never renders items the user cannot access.
--->
-<div id="sidebar"
-     class="d-flex flex-column text-white vh-100 p-3 flex-shrink-0"
-     style="width: var(--sidebar-width); background-color: var(--sidebar-bg);">
+    Receives sidebar_menu from the context processor, already filtered by the
+    user's permissions, with is_current set on the item of the page shown.
+    Never renders items the user cannot access. The url tag with "as" never
+    raises: a wrong url_name gives an inert '#' link instead of a broken page.
+    From md up the sidebar is a sticky column; below md it is a Bootstrap
+    offcanvas opened from the top bar. Icons go through known_icon: a name
+    missing from the vendored font would render as plain text, so it is left
+    out instead.
+{% endcomment %}
+<aside class="sidebar">
+    <div id="sidebar" class="sidebar__panel offcanvas-md offcanvas-start" tabindex="-1" aria-label="Menú">
 
-    <!-- Brand -->
-    <div class="fw-bold fs-6 mb-4 px-2 text-uppercase letter-spacing-1">
-        Ouroboros
-    </div>
-
-    <nav class="nav flex-column gap-1">
-        {% for entry in sidebar_menu %}
-
-            {% if entry.children %}
-                <!--
-                    Collapsible section — Bootstrap collapse, no custom JS.
-                -->
-                <button
-                    class="btn btn-sm text-start text-white d-flex align-items-center gap-2 px-2 py-1 w-100 border-0"
-                    style="background: transparent; font-size: 12px; opacity: .75;"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#menu-{{ entry.item.pk }}"
-                    aria-expanded="false">
-                    {% if entry.item.icon %}
-                        <span class="icon" aria-hidden="true">{{ entry.item.icon }}</span>
-                    {% endif %}
-                    {{ entry.item.label }}
-                </button>
-
-                <div id="menu-{{ entry.item.pk }}" class="collapse ps-3">
-                    {% for child in entry.children %}
-                        
-                        <a    href="{% if child.url_name %}{% url child.url_name %}{% else %}#{% endif %}"
-                            class="nav-link text-white py-1 px-2 d-flex align-items-center gap-2"
-                            style="font-size: 12px; opacity: .65;"
-                        >
-                            {% if child.icon %}
-                                <span class="icon" aria-hidden="true">{{ child.icon }}</span>
-                            {% endif %}
-                            {{ child.label }}
-                        </a>
-                    {% endfor %}
-                </div>
-
-            {% else %}
-                <!-- Standalone item -->
-                
-                <a    href="{% if entry.item.url_name %}{% url entry.item.url_name %}{% else %}#{% endif %}"
-                    class="nav-link text-white px-2 py-1 d-flex align-items-center gap-2"
-                    style="font-size: 13px;"
-                >
-                    {% if entry.item.icon %}
-                        <span class="icon" aria-hidden="true">{{ entry.item.icon }}</span>
-                    {% endif %}
-                    {{ entry.item.label }}
-                </a>
-            {% endif %}
-
-        {% endfor %}
-    </nav>
-
-    <!-- Signed-in user and logout (POST: a GET link could be triggered by any page). -->
-    <div class="mt-auto pt-3 border-top border-secondary">
-        <div class="px-2 mb-2 text-truncate" style="font-size: 12px; opacity: .75;">
-            <span class="icon" aria-hidden="true">person</span>
-            {{ request.user.get_full_name|default:request.user.username }}
-        </div>
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit"
-                    class="btn btn-sm text-start text-white d-flex align-items-center gap-2 px-2 py-1 w-100 border-0"
-                    style="background: transparent; font-size: 12px; opacity: .75;">
-                <span class="icon" aria-hidden="true">logout</span>
-                Cerrar sesión
+        <div class="sidebar__brand">
+            <span>Ouroboros</span>
+            <button type="button" class="btn-icon d-md-none" data-bs-dismiss="offcanvas"
+                    data-bs-target="#sidebar" aria-label="Cerrar menú">
+                <span class="icon" aria-hidden="true">close</span>
             </button>
-        </form>
-    </div>
+        </div>
 
-</div>
+        <nav class="sidebar__nav" aria-label="Menú principal">
+            {% for entry in sidebar_menu %}
+                {% with item=entry.item %}
+                {% if entry.children %}
+                    <!-- Collapsible section (Bootstrap collapse); open when it holds the current page. -->
+                    <button type="button" class="sidebar__link"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#menu-{{ item.pk }}"
+                            aria-controls="menu-{{ item.pk }}"
+                            aria-expanded="{% if item.has_current_child %}true{% else %}false{% endif %}">
+                        <span class="icon sidebar__icon" aria-hidden="true">{{ item.icon|known_icon }}</span>
+                        <span class="sidebar__label">{{ item.label }}</span>
+                        <span class="icon sidebar__chevron" aria-hidden="true">expand_more</span>
+                    </button>
+
+                    <div id="menu-{{ item.pk }}" class="collapse{% if item.has_current_child %} show{% endif %}">
+                        <div class="sidebar__sub">
+                            {% for child in entry.children %}
+                                {% url child.url_name as href %}
+                                <a href="{{ href|default:'#' }}" class="sidebar__link"
+                                   {% if child.is_current %}aria-current="page"{% endif %}>
+                                    {% with icon=child.icon|known_icon %}
+                                        {% if icon %}<span class="icon sidebar__icon" aria-hidden="true">{{ icon }}</span>{% endif %}
+                                    {% endwith %}
+                                    <span class="sidebar__label">{{ child.label }}</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                {% else %}
+                    {% url item.url_name as href %}
+                    <a href="{{ href|default:'#' }}" class="sidebar__link"
+                       {% if item.is_current %}aria-current="page"{% endif %}>
+                        <span class="icon sidebar__icon" aria-hidden="true">{{ item.icon|known_icon }}</span>
+                        <span class="sidebar__label">{{ item.label }}</span>
+                    </a>
+                {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </nav>
+
+        <!-- Signed-in user and logout (POST: a GET link could be triggered by any page). -->
+        <div class="sidebar__footer">
+            <div class="sidebar__user" title="{{ request.user.username }}">
+                <span class="icon sidebar__icon" aria-hidden="true">person</span>
+                <span class="sidebar__label">{{ request.user.get_full_name|default:request.user.username }}</span>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="sidebar__link">
+                    <span class="icon sidebar__icon" aria-hidden="true">logout</span>
+                    <span class="sidebar__label">Cerrar sesión</span>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</aside>

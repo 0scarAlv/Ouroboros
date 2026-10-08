@@ -12,20 +12,29 @@
     <script src="{% static 'vendor/alpinejs/alpine.min.js' %}" defer></script>
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
     {% block extra_css %}{% endblock %}
-    
 </head>
 
 <!-- htmx sends the CSRF token on every request (the cookie is HttpOnly). -->
-<body class="bg-light" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 
-    <div class="d-flex">
+    <div class="app">
 
         {% if request.user.is_authenticated %}
             {% include "_sidebar.html" %}
         {% endif %}
 
-        <div class="flex-grow-1 d-flex flex-column">
-            <main class="container-fluid py-4 px-4">
+        <div class="app-content">
+            {% if request.user.is_authenticated %}
+                <!-- Phones and narrow windows: the sidebar opens as an offcanvas. -->
+                <header class="topbar d-md-none">
+                    <button type="button" class="btn-icon" data-bs-toggle="offcanvas"
+                            data-bs-target="#sidebar" aria-controls="sidebar" aria-label="Abrir menú">
+                        <span class="icon" aria-hidden="true">menu</span>
+                    </button>
+                    <span class="topbar__brand">Ouroboros</span>
+                </header>
+            {% endif %}
+            <main class="app-main">
                 {% block content %}{% endblock %}
             </main>
         </div>
@@ -37,11 +46,7 @@
         Toasts are injected here dynamically by the JS below.
         Any view can trigger a toast via HX-Trigger response header.
     -->
-    <div
-        id="toast-container"
-        class="toast-container position-fixed bottom-0 end-0 p-3"
-        style="z-index: 9999;"
-    ></div>
+    <div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
     <!-- Django messages, shown as toasts by main.js (no inline script: CSP). -->
     {% if messages %}
@@ -56,6 +61,8 @@
 
     <!-- Toast system -->
     <script src="{% static 'js/main.js' %}"></script>
+    <!-- CRUD list page: row selection, toolbar and panel (inert on other pages). -->
+    <script src="{% static 'js/crud.js' %}"></script>
 
     {% block extra_js %}{% endblock %}
 

@@ -3,29 +3,73 @@
 {% block title %}{{ crud.verbose_name_plural|capfirst }} — Ouroboros{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-3">
-    <h5 class="fw-bold mb-0">{{ crud.verbose_name_plural|capfirst }}</h5>
-    {% if crud.can_add %}
-        <a href="{% url crud.urls.create %}" class="btn btn-primary btn-sm d-flex align-items-center gap-1">
-            <span class="icon" aria-hidden="true">add</span> Nuevo
-        </a>
-    {% endif %}
+<div class="page-header">
+    <h1 class="page-title">{{ crud.verbose_name_plural|capfirst }}</h1>
 </div>
 
-<div class="card">
-    {% if searchable %}
-        <div class="p-2 border-bottom">
-            <!-- htmx swaps only the table; the URL keeps the search for reloads. -->
-            <input type="search" name="q" value="{{ query }}" placeholder="Buscar…"
-                   class="form-control form-control-sm"
-                   aria-label="Buscar"
-                   hx-get="{% url crud.urls.list %}"
-                   hx-trigger="input changed delay:300ms, search"
-                   hx-target="#crud-table"
-                   hx-push-url="true">
-        </div>
-    {% endif %}
-    <div id="crud-table">
+{% comment %}
+    One toolbar acts on the selected row (kernel/static/js/crud.js): click a
+    row to select it, then Modificar / Eliminar / Historial / Ver open in the
+    panel above the table. Buttons needing a row stay disabled until one is
+    selected. Only permitted actions with an existing route are rendered.
+    The button that opened the panel turns into "Cancelar" (data-label and
+    data-icon keep its own label to restore it) and closes the panel.
+{% endcomment %}
+<div class="surface" data-crud-list
+     data-crud-default="{% if crud.can_change %}update{% elif crud.urls.detail %}detail{% endif %}">
+
+    <div class="crud-toolbar">
+        {% if crud.can_add %}
+            <a href="{% url crud.urls.create %}" class="btn btn-primary btn-sm" aria-controls="crud-panel" aria-expanded="false"
+               data-label="Nuevo" data-icon="add" data-crud-action="create">
+                <span class="icon" aria-hidden="true" data-crud-icon>add</span><span data-crud-label>Nuevo</span>
+            </a>
+        {% endif %}
+        {% if crud.can_change %}
+            <button type="button" class="btn btn-tool btn-sm" aria-controls="crud-panel" aria-expanded="false"
+               data-label="Modificar" data-icon="edit" data-crud-action="update" disabled>
+                <span class="icon" aria-hidden="true" data-crud-icon>edit</span><span data-crud-label>Modificar</span>
+            </button>
+        {% endif %}
+        {% if crud.can_delete %}
+            <button type="button" class="btn btn-tool btn-tool--danger btn-sm" aria-controls="crud-panel" aria-expanded="false"
+               data-label="Eliminar" data-icon="delete" data-crud-action="delete" disabled>
+                <span class="icon" aria-hidden="true" data-crud-icon>delete</span><span data-crud-label>Eliminar</span>
+            </button>
+        {% endif %}
+        {% if crud.has_history %}
+            <button type="button" class="btn btn-tool btn-sm" aria-controls="crud-panel" aria-expanded="false"
+               data-label="Historial" data-icon="history" data-crud-action="history" disabled>
+                <span class="icon" aria-hidden="true" data-crud-icon>history</span><span data-crud-label>Historial</span>
+            </button>
+        {% endif %}
+        {% if crud.urls.detail and not crud.can_change %}
+            <button type="button" class="btn btn-tool btn-sm" aria-controls="crud-panel" aria-expanded="false"
+               data-label="Ver" data-icon="visibility" data-crud-action="detail" disabled>
+                <span class="icon" aria-hidden="true" data-crud-icon>visibility</span><span data-crud-label>Ver</span>
+            </button>
+        {% endif %}
+
+        {% if searchable %}
+            <div class="crud-toolbar__search">
+                <!-- htmx swaps only the table; the URL keeps the search for reloads. -->
+                <input type="search" name="q" value="{{ query }}" placeholder="Buscar…"
+                       class="form-control form-control-sm"
+                       aria-label="Buscar {{ crud.verbose_name_plural }}"
+                       hx-get="{% url crud.urls.list %}"
+                       hx-trigger="input changed delay:300ms, search"
+                       hx-target="#crud-table"
+                       hx-push-url="true">
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Detail, forms, delete and history open here; the table slides down. -->
+    <section id="crud-panel" class="crud-panel" aria-label="Registro">
+        <div id="crud-panel-body" class="crud-panel__inner" inert></div>
+    </section>
+
+    <div id="crud-table" class="crud-table">
         {% include "crud/_list_table.html" %}
     </div>
 </div>

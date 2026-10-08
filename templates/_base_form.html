@@ -1,35 +1,46 @@
-<div class="card">
+{% comment %}
+    Form skeleton as a panel: header, fields (block form_fields), actions.
+    With in_panel (htmx request from the list page) the form posts through
+    htmx back into the panel and Cancel/close just close it; on a full page
+    it is a plain POST form and Cancel goes back to cancel_url.
+{% endcomment %}
+{% with form_id=form_id|default:'main-form' %}
+<section class="panel" aria-labelledby="{{ form_id }}-title">
 
-    <!-- Form header -->
-    <div class="px-3 py-2 border-bottom d-flex align-items-center justify-content-between"
-         style="background: #f8f8f8; border-radius: var(--card-radius) var(--card-radius) 0 0;">
-        <span class="fw-semibold" style="font-size: 13px;">{{ title }}</span>
-    </div>
+    <header class="panel__header">
+        <h2 class="panel__title" id="{{ form_id }}-title">{{ title }}</h2>
+        {% if in_panel %}
+            <button type="button" class="btn-icon" data-crud-close aria-label="Cerrar" title="Cerrar (Esc)">
+                <span class="icon" aria-hidden="true">close</span>
+            </button>
+        {% elif cancel_url %}
+            <a href="{{ cancel_url }}" class="btn-icon" aria-label="Cerrar" title="Cerrar">
+                <span class="icon" aria-hidden="true">close</span>
+            </a>
+        {% endif %}
+    </header>
 
-    <!-- Form body -->
-    <div class="p-3">
-        <form
-            id="{{ form_id|default:'main-form' }}"
-            method="post"
-            {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
-        >
-            {% csrf_token %}
+    <form id="{{ form_id }}" method="post"
+          {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}
+          {% if in_panel %}hx-post="{{ request.get_full_path }}" hx-target="#crud-panel-body" hx-swap="innerHTML" hx-disabled-elt="find button[type='submit']"{% endif %}>
+        {% csrf_token %}
 
+        <div class="panel__body">
             {% block form_fields %}{% endblock %}
+        </div>
 
-            <!-- Action buttons -->
-            <div class="d-flex gap-2 mt-3 pt-2 border-top">
-                <button type="submit" class="btn btn-primary btn-sm px-3">
-                    {{ submit_label|default:"Guardar" }}
-                </button>
-                {% if cancel_url %}
-                <a href="{{ cancel_url }}" class="btn btn-outline-secondary btn-sm px-3">
-                    Cancelar
-                </a>
-                {% endif %}
-            </div>
+        <div class="panel__actions">
+            <button type="submit" class="btn btn-primary btn-sm">
+                {{ submit_label|default:"Guardar" }}
+            </button>
+            {% if in_panel %}
+                <button type="button" class="btn btn-tool btn-sm" data-crud-close>Cancelar</button>
+            {% elif cancel_url %}
+                <a href="{{ cancel_url }}" class="btn btn-tool btn-sm">Cancelar</a>
+            {% endif %}
+            {% block form_meta %}{% endblock %}
+        </div>
 
-        </form>
-    </div>
-
-</div>
+    </form>
+</section>
+{% endwith %}

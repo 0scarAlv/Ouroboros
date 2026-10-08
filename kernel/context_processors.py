@@ -24,6 +24,8 @@ def sidebar_menu(request):
         .prefetch_related(Prefetch("children", queryset=active_children))
     )
 
+    current = _route_prefix(getattr(request.resolver_match, "view_name", ""))
+
     menu = []
     for parent in parents:
         if not parent.is_accessible_by(request.user):
@@ -36,9 +38,26 @@ def sidebar_menu(request):
         if not children and not parent.url_name:
             continue
 
+        for item in (parent, *children):
+            item.is_current = bool(current) and _route_prefix(item.url_name) == current
+        parent.has_current_child = any(child.is_current for child in children)
+
         menu.append({
             "item": parent,
             "children": children,
         })
 
     return {"sidebar_menu": menu}
+
+
+CRUD_ACTIONS = ("list", "detail", "create", "update", "delete", "history")
+
+
+def _route_prefix(url_name):
+    """
+    'app:model_list' -> 'app:model': a menu item stays highlighted on every
+    page of its CRUD (list, detail, create, ...). Other names are compared
+    whole.
+    """
+    base, sep, action = url_name.rpartition("_")
+    return base if sep and action in CRUD_ACTIONS else url_name

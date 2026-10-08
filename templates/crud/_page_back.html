@@ -1,0 +1,6 @@
+{# Full pages only: link back to the list. #}
+<div class="page-header">
+    <a href="{% url crud.urls.list %}" class="page-back">
+        <span class="icon" aria-hidden="true">arrow_back</span>{{ crud.verbose_name_plural|capfirst }}
+    </a>
+</div>

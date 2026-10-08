@@ -1,0 +1,7 @@
+{# When and by whom an existing record was created and last changed. #}
+{% if object.pk %}
+    <span class="panel__meta ms-auto">
+        Creado {{ object.created_at|date:"SHORT_DATETIME_FORMAT" }}{% if object.created_by %} por {{ object.created_by }}{% endif %}
+        · Modificado {{ object.updated_at|date:"SHORT_DATETIME_FORMAT" }}{% if object.updated_by %} por {{ object.updated_by }}{% endif %}
+    </span>
+{% endif %}
