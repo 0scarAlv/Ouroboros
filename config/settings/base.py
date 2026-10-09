@@ -183,6 +183,7 @@ STORAGES = {
 # Uploaded files. They are never served by URL: attachments go through
 # their permission-checked download view.
 MEDIA_ROOT = config('MEDIA_ROOT', default=str(BASE_DIR / 'media'))
+BACKUP_DIR = config('BACKUP_DIR', default=str(BASE_DIR / 'backups'))
 MEDIA_URL = '/media/'
 
 # Default primary key

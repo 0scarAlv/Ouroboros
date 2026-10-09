@@ -21,6 +21,7 @@ DATABASES = {
 }
 MEDIA_ROOT = config('MEDIA_ROOT', default=str(DATA_DIR / 'media'))
 LOG_DIR = Path(config('LOG_DIR', default=str(DATA_DIR / 'logs')))
+BACKUP_DIR = config('BACKUP_DIR', default=str(DATA_DIR / 'backups'))
 
 # Plain HTTP by default: there is no certificate on a local network.
 # Set USE_HTTPS=True once a TLS proxy (e.g. Caddy with a local certificate)

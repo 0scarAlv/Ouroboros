@@ -128,6 +128,10 @@ database (SQLite by default, Postgres supported,
 SQLite encrypted at rest with `sqlcipher:///path?key_file=...` and
 `requirements/sqlcipher.txt`).
 
+An instance is prepared with `manage.py setup_instance` (idempotent) and
+backed up with `manage.py backup` / `restore` (`kernel/backup.py`: SQLite
+plus uploads in one zip with checksums; the key file is never included).
+
 ## Language
 
 Code, comments, docstrings, commit messages and issues in English; UI text
