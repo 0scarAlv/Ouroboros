@@ -70,6 +70,18 @@ The database, uploads and logs live under `DATA_DIR`. The profile uses
 plain HTTP; waitress has no TLS, so HTTPS needs a proxy in front (e.g.
 Caddy with a local certificate) and `USE_HTTPS=True`.
 
+To encrypt the database file at rest (SQLCipher), install
+`requirements/sqlcipher.txt`, create a key file once and point
+`DATABASE_URL` at both:
+
+```bash
+python -c "from kernel.db.keys import create_key_file; create_key_file('data/db.key')"
+DATABASE_URL=sqlcipher:////absolute/path/data/db.sqlite3?key_file=/absolute/path/data/db.key
+```
+
+Without the key file the database cannot be opened, so back it up
+separately from the data and keep it away from the database backups.
+
 ## Requirements
 
 - Python 3.10+

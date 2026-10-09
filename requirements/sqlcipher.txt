@@ -1,0 +1,2 @@
+-r base.txt
+sqlcipher3>=0.6.3

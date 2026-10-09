@@ -87,7 +87,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # One URL selects the engine, so each product picks what suits its client:
 # sqlite:///path/db.sqlite3, postgres://user:pass@host:5432/name, ...
-# Defaults to a local SQLite file for development.
+# Defaults to a local SQLite file for development. sqlcipher:///path?key_file=...
+# is SQLite encrypted at rest (requirements/sqlcipher.txt).
+dj_database_url.register('sqlcipher', 'kernel.db.backends.sqlcipher')
 DATABASES = {
     'default': dj_database_url.parse(
         config('DATABASE_URL', default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}")

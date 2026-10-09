@@ -124,7 +124,9 @@ permission-checked views (`attachments`), never from `MEDIA_URL`.
 `config.settings.dev` (default for `manage.py`), `prod` (server with
 HTTPS), `onprem` (client PC on its LAN: waitress via `manage.py serve`,
 WhiteNoise, data under `DATA_DIR`). One `DATABASE_URL` selects the
-database (SQLite by default, Postgres supported).
+database (SQLite by default, Postgres supported,
+SQLite encrypted at rest with `sqlcipher:///path?key_file=...` and
+`requirements/sqlcipher.txt`).
 
 ## Language
 
