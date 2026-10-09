@@ -32,6 +32,8 @@ ICON_NAMES = [
     'barcode_scanner', 'category', 'factory', 'inventory', 'inventory_2',
     'label', 'local_shipping', 'medication', 'payments', 'point_of_sale',
     'qr_code_scanner', 'shopping_cart', 'warehouse',
+    # Appearance (theme switch)
+    'contrast', 'dark_mode', 'light_mode',
     # Reports
     'bar_chart', 'trending_down', 'trending_up',
 ]

@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Ouroboros{% endblock %}</title>
+    <!-- Sets data-bs-theme before the first paint (synchronous on purpose, no defer). -->
+    <script src="{% static 'js/theme.js' %}"></script>
     <!-- Vendored assets (kernel/static/vendor): the app must work offline. -->
     <link href="{% static 'vendor/bootstrap/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'vendor/material-symbols/material-symbols.css' %}" rel="stylesheet">

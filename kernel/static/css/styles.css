@@ -1,11 +1,17 @@
 /*
  * Ouroboros design tokens and components.
  *
- * Direction: a dense, calm work tool. Neutral greys for structure, one accent
- * (a muted steel blue) for primary actions and selection, semantic colours
- * only for meaning. 13px body on a 4px grid, thin 1px borders, flat
- * surfaces; shadows only on things that float (toasts, dropdowns).
- * A product rebrands by overriding the tokens in :root.
+ * Direction: a dense, calm work tool. Neutrals with a faint green tint for
+ * structure, one deep pine green accent for primary actions, selection and
+ * focus, semantic colours only for meaning (success is a warmer leaf green
+ * so it never reads as the accent). 13px body on a 4px grid, thin 1px
+ * borders, flat surfaces; shadows only on things that float.
+ *
+ * Tokens are the only place a product changes to rebrand: light values in
+ * :root, dark values in [data-bs-theme="dark"] (set on <html> by
+ * kernel/static/js/theme.js). Bootstrap is wired to the tokens at the end
+ * of :root, so its components follow both modes. Every text/background
+ * pair below meets WCAG AA (4.5:1 text, 3:1 borders and focus rings).
  */
 :root {
     /* Type */
@@ -22,31 +28,41 @@
     --space-4: 16px;
     --space-5: 20px;
 
-    /* Neutrals */
-    --c-bg: #f3f4f6;
+    /* Neutrals (faint green tint) */
+    --c-bg: #f2f5f3;
     --c-surface: #ffffff;
-    --c-surface-muted: #f7f8fa;
-    --c-border: #dcdfe4;
-    --c-border-strong: #c2c7cf;
-    --c-text: #1d2125;
-    --c-text-muted: #5a626d;   /* 6.2:1 on white */
+    --c-surface-muted: #f5f7f6;
+    --c-border: #d8dfdb;           /* dividers */
+    --c-border-strong: #7f8c85;    /* control borders: 3.5:1 on surface */
+    --c-text: #1a2420;             /* 15.9:1 on surface */
+    --c-text-muted: #55625b;       /* 6.4:1 on surface */
+    --c-hover-overlay: rgba(26, 36, 32, .06);
 
-    /* Accent: primary actions, selection, focus */
-    --c-accent: #1f5c99;        /* 7.0:1 on white */
-    --c-accent-hover: #184b7d;
-    --c-accent-subtle: #e3ecf6;
-    --c-on-accent: #ffffff;
+    /* Accent: pine green */
+    --c-accent: #1b6b50;           /* 6.4:1 on surface */
+    --c-accent-hover: #155640;
+    --c-accent-subtle: #e0eee7;
+    --c-on-accent: #ffffff;        /* 6.4:1 on accent */
 
     /* Semantic */
-    --c-danger: #b42318;
-    --c-danger-hover: #931c13;
+    --c-danger: #b42318;           /* text and borders: 6.6:1 on surface */
+    --c-danger-solid: #b42318;     /* button background */
+    --c-danger-solid-hover: #931c13;
     --c-danger-subtle: #fdeceb;
-    --c-success: #1a7f37;
-    --c-warning: #9a6700;
+    --c-on-danger: #ffffff;
+    --c-success: #3c7a1c;          /* leaf green, warmer than the accent */
+    --c-warning: #8a5a00;          /* text: 5.9:1 on surface */
+
+    /* Toasts (white text on solid colour; warning uses dark text) */
+    --c-toast-success: #3c7a1c;
+    --c-toast-danger: #b42318;
+    --c-toast-info: #2c3a34;
+    --c-toast-warning: #f0c04a;
+    --c-toast-warning-text: #2a1f00;
 
     /* Table rows */
-    --c-row-hover: #f1f4f8;
-    --c-row-selected: #dce8f5;
+    --c-row-hover: #edf3f0;
+    --c-row-selected: #d5e8de;     /* accent bar on it: 5.0:1 */
     --row-height: 34px;
 
     /* Controls */
@@ -57,35 +73,107 @@
     --radius: 4px;
     --card-radius: var(--radius);
     --focus-ring: 0 0 0 2px var(--c-surface), 0 0 0 4px var(--c-accent);
+    --shadow-float: 0 4px 12px rgba(16, 24, 20, .18);
 
-    /* Sidebar (dark graphite frame around the work area) */
+    /* Sidebar: dark pine-graphite frame */
     --sidebar-width: 232px;
-    --sidebar-bg: #1f2429;
-    --sidebar-text: #e4e7eb;
-    --sidebar-text-muted: #a2aab4;   /* 7.0:1 on --sidebar-bg */
-    --sidebar-hover: #2b3138;
-    --sidebar-active-bg: #323a43;
-    --sidebar-active-bar: #6ea8e0;
-    --sidebar-border: #343b43;
+    --sidebar-bg: #16201c;
+    --sidebar-text: #e2e9e5;       /* 13.5:1 */
+    --sidebar-text-muted: #9fb1a8; /* 7.4:1 */
+    --sidebar-hover: #213029;
+    --sidebar-active-bg: #293b33;
+    --sidebar-active-bar: #6cc3a0;
+    --sidebar-border: #2a3832;
 
     /* Motion: only to explain a change of state */
     --motion: 200ms;
     --ease: cubic-bezier(.2, 0, 0, 1);
 
-    /* Bootstrap hooks */
+    /* RGB copies Bootstrap needs for its rgba() rules (keep in sync). */
+    --c-accent-rgb: 27, 107, 80;
+    --c-accent-hover-rgb: 21, 86, 64;
+    --c-text-rgb: 26, 36, 32;
+    --c-bg-rgb: 242, 245, 243;
+
+    /* Bootstrap hooks: computed from the tokens in both modes. */
     --bs-body-font-family: var(--font-sans);
     --bs-body-font-size: var(--fs-base);
     --bs-body-color: var(--c-text);
+    --bs-body-color-rgb: var(--c-text-rgb);
     --bs-body-bg: var(--c-bg);
-    --bs-border-color: var(--c-border);
+    --bs-body-bg-rgb: var(--c-bg-rgb);
+    --bs-emphasis-color: var(--c-text);
+    --bs-heading-color: var(--c-text);
     --bs-secondary-color: var(--c-text-muted);
+    --bs-secondary-bg: var(--c-surface-muted);
+    --bs-tertiary-bg: var(--c-surface-muted);
+    --bs-border-color: var(--c-border);
+    --bs-primary: var(--c-accent);
+    --bs-primary-rgb: var(--c-accent-rgb);
     --bs-link-color: var(--c-accent);
-    --bs-link-color-rgb: 31, 92, 153;
+    --bs-link-color-rgb: var(--c-accent-rgb);
     --bs-link-hover-color: var(--c-accent-hover);
-    --bs-link-hover-color-rgb: 24, 75, 125;
+    --bs-link-hover-color-rgb: var(--c-accent-hover-rgb);
+    --bs-form-invalid-color: var(--c-danger);
+    --bs-form-invalid-border-color: var(--c-danger);
+    --bs-danger-text-emphasis: var(--c-danger);
+    --bs-danger-bg-subtle: var(--c-danger-subtle);
+    --bs-danger-border-subtle: var(--c-danger);
     --bs-border-radius: var(--radius);
     --bs-border-radius-sm: var(--radius);
 }
+
+/* Dark mode: same roles, dark values. The accent turns lighter and buttons
+   on it use dark text. */
+[data-bs-theme="dark"] {
+    --c-bg: #0f1412;
+    --c-surface: #171e1b;
+    --c-surface-muted: #1c2420;
+    /* Text and borders are kept dim on purpose: bright text on a dark
+       background glares on long shifts. */
+    --c-border: #252f2b;
+    --c-border-strong: #55625c;    /* 2.7:1 on surface */
+    --c-text: #b9c2bd;             /* 9.3:1 on surface */
+    --c-text-muted: #939f99;       /* 6.2:1 on surface */
+    --c-hover-overlay: rgba(185, 194, 189, .07);
+
+    --c-accent: #5fb894;           /* 7.1:1 on surface */
+    --c-accent-hover: #78c6a6;
+    --c-accent-subtle: #1c3329;
+    --c-on-accent: #0b1a13;        /* 7.5:1 on accent */
+
+    --c-danger: #f28b80;           /* 7.1:1 on surface */
+    --c-danger-solid: #c33a2e;     /* white text: 5.3:1 */
+    --c-danger-solid-hover: #a83125;
+    --c-danger-subtle: #3b1f1c;
+    --c-success: #357018;
+    --c-warning: #e8b44a;          /* 8.9:1 on surface */
+
+    --c-toast-success: #357018;
+    --c-toast-danger: #c33a2e;
+    --c-toast-info: #33433c;
+    --c-toast-warning: #e8b44a;
+    --c-toast-warning-text: #2a1f00;
+
+    --c-row-hover: #1d2723;
+    --c-row-selected: #22402f;     /* accent bar on it: 4.8:1 */
+    --shadow-float: 0 4px 16px rgba(0, 0, 0, .5);
+
+    --sidebar-bg: #0b100e;
+    --sidebar-text: #b9c2bd;       /* 10.5:1 */
+    --sidebar-text-muted: #85918b; /* 5.7:1 */
+    --sidebar-hover: #18221e;
+    --sidebar-active-bg: #20302a;
+    --sidebar-active-bar: #6cc3a0;
+    --sidebar-border: #1a2420;
+
+    --c-accent-rgb: 95, 184, 148;
+    --c-accent-hover-rgb: 120, 198, 166;
+    --c-text-rgb: 185, 194, 189;
+    --c-bg-rgb: 15, 20, 18;
+}
+
+
 
 body {
     background: var(--c-bg);
@@ -347,13 +435,23 @@ body {
     --bs-btn-disabled-border-color: var(--c-accent);
 }
 
+.btn-primary {
+    --bs-btn-color: var(--c-on-accent);
+    --bs-btn-hover-color: var(--c-on-accent);
+    --bs-btn-active-color: var(--c-on-accent);
+    --bs-btn-disabled-color: var(--c-on-accent);
+}
+
 .btn-danger {
-    --bs-btn-bg: var(--c-danger);
-    --bs-btn-border-color: var(--c-danger);
-    --bs-btn-hover-bg: var(--c-danger-hover);
-    --bs-btn-hover-border-color: var(--c-danger-hover);
-    --bs-btn-active-bg: var(--c-danger-hover);
-    --bs-btn-active-border-color: var(--c-danger-hover);
+    --bs-btn-color: var(--c-on-danger);
+    --bs-btn-bg: var(--c-danger-solid);
+    --bs-btn-border-color: var(--c-danger-solid);
+    --bs-btn-hover-color: var(--c-on-danger);
+    --bs-btn-hover-bg: var(--c-danger-solid-hover);
+    --bs-btn-hover-border-color: var(--c-danger-solid-hover);
+    --bs-btn-active-color: var(--c-on-danger);
+    --bs-btn-active-bg: var(--c-danger-solid-hover);
+    --bs-btn-active-border-color: var(--c-danger-solid-hover);
 }
 
 /* Neutral toolbar / secondary button. */
@@ -378,9 +476,9 @@ body {
 
 .btn-tool--danger {
     --bs-btn-color: var(--c-danger);
-    --bs-btn-hover-color: var(--c-danger-hover);
+    --bs-btn-hover-color: var(--c-danger);
     --bs-btn-hover-bg: var(--c-danger-subtle);
-    --bs-btn-active-color: var(--c-danger-hover);
+    --bs-btn-active-color: var(--c-danger);
     --bs-btn-active-bg: var(--c-danger-subtle);
 }
 
@@ -400,7 +498,7 @@ body {
     color: inherit;
 }
 
-.btn-icon:hover { background: rgba(0, 0, 0, .06); }
+.btn-icon:hover { background: var(--c-hover-overlay); }
 .topbar .btn-icon:hover,
 .sidebar .btn-icon:hover { background: var(--sidebar-hover); }
 .btn-icon:focus-visible { outline: none; box-shadow: var(--focus-ring); }
@@ -716,7 +814,48 @@ textarea.form-control {
 /* ---- Toasts ------------------------------------------------------------- */
 
 .toast-container { z-index: 1090; }
-.toast { font-size: var(--fs-base); border-radius: var(--radius); }
+
+.toast {
+    --bs-toast-color: #ffffff;
+    --bs-toast-border-width: 0;
+    --bs-toast-box-shadow: var(--shadow-float);
+    font-size: var(--fs-base);
+    border-radius: var(--radius);
+    color: #ffffff;
+}
+
+.toast .icon { font-size: 18px; flex: 0 0 auto; }
+.toast--success { background: var(--c-toast-success); }
+.toast--danger { background: var(--c-toast-danger); }
+.toast--info { background: var(--c-toast-info); }
+.toast--warning { background: var(--c-toast-warning); color: var(--c-toast-warning-text); }
+/* Dark close icon on the light warning toast. */
+.toast--warning .btn-close { filter: none; }
+
+
+/* ---- Misc pages --------------------------------------------------------- */
+
+.stat-label {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: var(--c-text-muted);
+}
+
+.stat-icon {
+    display: inline-flex;
+    padding: var(--space-2);
+    border-radius: var(--radius);
+    background: var(--c-accent-subtle);
+    color: var(--c-accent);
+}
+
+.auth-card { max-width: 360px; margin: 10vh auto 0; }
+
+/* Theme switch in the sidebar footer. */
+.theme-switch .sidebar__label { color: var(--sidebar-text-muted); }
+.theme-switch:hover .sidebar__label { color: var(--sidebar-text); }
 
 
 /* ---- Full CRUD pages ---------------------------------------------------- */

@@ -3,17 +3,10 @@
 {% block title %}Login — Ouroboros{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <div class="card shadow-sm mt-5">
-            <div class="card-body p-4">
-
-                <h4 class="card-title mb-4 text-center fw-bold">Iniciar sesión</h4>
-
-                {% include "authentication/_login_form.html" %}
-
-            </div>
-        </div>
+<div class="auth-card surface">
+    <div class="p-4">
+        <h1 class="page-title mb-3">Iniciar sesión</h1>
+        {% include "authentication/_login_form.html" %}
     </div>
 </div>
 {% endblock %}

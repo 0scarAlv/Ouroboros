@@ -69,6 +69,11 @@
                 <span class="icon sidebar__icon" aria-hidden="true">person</span>
                 <span class="sidebar__label">{{ request.user.get_full_name|default:request.user.username }}</span>
             </div>
+            <!-- Cycles Automático / Claro / Oscuro; theme.js fills in the label and icon. -->
+            <button type="button" class="sidebar__link theme-switch" data-theme-switch aria-label="Cambiar tema">
+                <span class="icon sidebar__icon" aria-hidden="true" data-theme-icon></span>
+                <span class="sidebar__label" data-theme-label>Tema</span>
+            </button>
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit" class="sidebar__link">

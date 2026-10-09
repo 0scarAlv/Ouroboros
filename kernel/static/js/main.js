@@ -1,31 +1,30 @@
 function showToast(message, type = "info") {
     const container = document.getElementById("toast-container");
 
-    // Map type to Bootstrap bg utility class
-    const bgClass = {
-        success: "bg-success",
-        danger:  "bg-danger",
-        warning: "bg-warning",
-        info:    "bg-info",
-    }[type] || "bg-secondary";
+    // Colours come from the --c-toast-* tokens (styles.css), so they follow
+    // the theme; the icon tells success from info without relying on colour.
+    const kind = ["success", "danger", "warning", "info"].includes(type) ? type : "info";
+    const icon = { success: "check_circle", danger: "error", warning: "warning", info: "info" }[kind];
 
     const toastEl = document.createElement("div");
-    toastEl.className = `toast align-items-center text-white ${bgClass} border-0`;
+    toastEl.className = `toast toast--${kind} align-items-center`;
     toastEl.setAttribute("role", "alert");
     toastEl.setAttribute("aria-live", "assertive");
     toastEl.setAttribute("aria-atomic", "true");
 
     toastEl.innerHTML = `
-        <div class="d-flex">
+        <div class="d-flex align-items-center">
+            <span class="icon ms-3" aria-hidden="true"></span>
             <div class="toast-body fw-semibold"></div>
             <button
                 type="button"
                 class="btn-close btn-close-white me-2 m-auto"
                 data-bs-dismiss="toast"
-                aria-label="Close">
+                aria-label="Cerrar">
             </button>
         </div>
     `;
+    toastEl.querySelector(".icon").textContent = icon;
     // textContent, never innerHTML: messages may contain user-entered text.
     toastEl.querySelector(".toast-body").textContent = message;
 

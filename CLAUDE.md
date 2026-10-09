@@ -90,6 +90,15 @@ passing: it generates a module per audit level and runs its tests.
   vendored under `kernel/static/vendor/` (the app must work offline;
   update with `scripts/update_vendor.py`). No CDNs.
 - The CSP forbids inline scripts: put JavaScript in static files.
+- Colours, type and spacing are tokens at the top of
+  `kernel/static/css/styles.css` (light values in `:root`, dark values in
+  `[data-bs-theme="dark"]`); Bootstrap is wired to them. A product rebrands
+  by changing tokens only, never by hard-coding colours in templates. Keep
+  text at 4.5:1 contrast and borders/focus at 3:1 in both modes.
+- Dark mode: `kernel/static/js/theme.js`, loaded synchronously in `<head>`,
+  sets `data-bs-theme` on `<html>` before the first paint. The choice
+  (Automático follows the OS, Claro, Oscuro) is switched from the sidebar
+  footer and kept in localStorage.
 - UI text is Spanish; form errors use the codes in
   `kernel.utils.forms.DEFAULT_ERROR_CODES`, translated by
   `kernel/constants/general.py`.
